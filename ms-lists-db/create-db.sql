@@ -153,7 +153,7 @@ CREATE TABLE TemplateViewSetting (
 CREATE TABLE TemplateSampleRow (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     ListTemplateId INT NOT NULL FOREIGN KEY REFERENCES ListTemplate(Id),
-    SampleRowName NVARCHAR(255),
+    DisplayOrder INT NOT NULL,
     CreateAt DATETIME NOT NULL DEFAULT GETDATE(),
     UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
 );
