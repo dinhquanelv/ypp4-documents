@@ -91,25 +91,26 @@ END;
 INSERT INTO ViewType (TypeName ,DisplayName, HeaderImage, Icon)
 VALUES
 ('Grid', 'Grid View', 'http://example.com/images/grid.png', 'grid_icon'),
-('Gallery', 'Gallery View', 'http://example.com/images/gallery.png', 'gallery_icon'),
 ('Calendar', 'Calendar View', 'http://example.com/images/calendar.png', 'calendar_icon'),
+('Gallery', 'Gallery View', 'http://example.com/images/gallery.png', 'gallery_icon'),
 ('Board', 'Kanban Board', 'http://example.com/images/board.png', 'board_icon');
 
 -- Insert into ViewSetting
 INSERT INTO ViewSetting (SettingKey, DisplayName, ValueType)
 VALUES
-('IsPublic', 'Visibility', 'STRING'),
+('IsPublic', 'Visibility', 'BOOLEAN'),
 ('StartDate', 'Start Date', 'INTEGER'),
 ('EndDate', 'End Date', 'INTEGER'),
 ('Title', 'Title', 'INTEGER'),
 ('Subheading', 'Subheading', 'INTEGER'),
-('OrganizeBoardBy', 'Organize board by', 'INTEGER');
+('OrganizeBoardBy', 'Organize board by', 'INTEGER'),
+('DefaultLayout', 'Default layout', 'String');
 
 -- Insert into ViewTypeSetting
 INSERT INTO ViewTypeSetting (ViewTypeId, ViewSettingId) 
 VALUES
 (1, 1),
-(2, 1),(2, 2),(2, 3),(2, 4),(2, 5),
+(2, 1),(2, 2),(2, 3),(2, 4),(2, 5),(2, 7),
 (3, 1),
 (4, 1),(4, 6);
 
@@ -153,9 +154,8 @@ SET @Counter = 1;
 WHILE @Counter <= 1000
 BEGIN
     DECLARE @ListTemplateId_TSR INT = (SELECT TOP 1 Id FROM ListTemplate ORDER BY NEWID());
-    DECLARE @SampleRowName_TSR NVARCHAR(255) = 'Sample Row ' + CAST(@Counter AS NVARCHAR(10));
-    INSERT INTO TemplateSampleRow (ListTemplateId, SampleRowName)
-    VALUES (@ListTemplateId_TSR, @SampleRowName_TSR);
+   INSERT INTO TemplateSampleRow (ListTemplateId, DisplayOrder)
+    VALUES (@ListTemplateId_TSR, @Counter % 100 + 1);
     SET @Counter = @Counter + 1;
 END;
 
