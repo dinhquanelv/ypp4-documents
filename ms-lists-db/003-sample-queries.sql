@@ -144,3 +144,27 @@ JOIN ListRow lr ON lr.Id = lrc.ListRowId
 JOIN Account a ON a.Id = lrc.CreatedBy
 WHERE lr.Id = 998
 ORDER BY lrc.CreateAt DESC
+
+-- screen 7: Custom column
+-- case 1: find all column type
+SELECT sdt.Icon, sdt.DisplayName, sdt.CoverImage, sdt.TypeDescription
+FROM SystemDataType sdt
+
+-- case 2: when user choose column type
+SELECT sdt.DisplayName, sdt.DataTypeValue, ks.KeyName, ks.DisplayName, ks.ValueType
+FROM DataTypeSettingKey dtsk
+JOIN SystemDataType sdt ON sdt.Id = dtsk.SystemDataTypeId
+JOIN KeySetting ks ON ks.Id = dtsk.KeySettingId
+WHERE sdt.Id = 1
+
+-- case 3: when user choose edit column
+SELECT ldc.ColumnName, ldc.ColumnDescription, 
+	sdt.DisplayName, sdt.DataTypeValue,
+	ks.KeyName, ks.ValueType, ks.DisplayName
+FROM ListDynamicColumn ldc
+JOIN SystemDataType sdt ON sdt.Id = ldc.SystemDataTypeId
+JOIN DataTypeSettingKey dtsk ON dtsk.SystemDataTypeId = sdt.Id
+LEFT JOIN ListColumnSettingValue lcsv 
+	ON lcsv.ColumnId = ldc.Id AND lcsv.DataTypeSettingKeyId = dtsk.Id
+JOIN KeySetting ks ON ks.Id = dtsk.KeySettingId
+WHERE ldc.Id = 2
