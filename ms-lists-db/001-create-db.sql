@@ -27,7 +27,6 @@ IF OBJECT_ID('SystemDataType', 'U') IS NOT NULL DROP TABLE SystemDataType;
 IF OBJECT_ID('ListView', 'U') IS NOT NULL DROP TABLE ListView;
 IF OBJECT_ID('FavoriteList', 'U') IS NOT NULL DROP TABLE FavoriteList;
 IF OBJECT_ID('List', 'U') IS NOT NULL DROP TABLE List;
-IF OBJECT_ID('ListType', 'U') IS NOT NULL DROP TABLE ListType;
 IF OBJECT_ID('TemplateSampleCell', 'U') IS NOT NULL DROP TABLE TemplateSampleCell;
 IF OBJECT_ID('TemplateSampleRow', 'U') IS NOT NULL DROP TABLE TemplateSampleRow;
 IF OBJECT_ID('TemplateViewSetting', 'U') IS NOT NULL DROP TABLE TemplateViewSetting;
@@ -38,6 +37,7 @@ IF OBJECT_ID('ViewSetting', 'U') IS NOT NULL DROP TABLE ViewSetting;
 IF OBJECT_ID('ViewType', 'U') IS NOT NULL DROP TABLE ViewType;
 IF OBJECT_ID('ListTemplate', 'U') IS NOT NULL DROP TABLE ListTemplate;
 IF OBJECT_ID('TemplateProvider', 'U') IS NOT NULL DROP TABLE TemplateProvider;
+IF OBJECT_ID('ListType', 'U') IS NOT NULL DROP TABLE ListType;
 IF OBJECT_ID('WorkspaceMember', 'U') IS NOT NULL DROP TABLE WorkspaceMember;
 IF OBJECT_ID('Workspace', 'U') IS NOT NULL DROP TABLE Workspace;
 IF OBJECT_ID('Account', 'U') IS NOT NULL DROP TABLE Account;
@@ -70,6 +70,16 @@ CREATE TABLE WorkspaceMember (
     UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
 );
 
+CREATE TABLE ListType (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Title NVARCHAR(255) NOT NULL,
+    Icon NVARCHAR(100),
+    HeaderImage NVARCHAR(255),
+    ListTypeDescription NVARCHAR(1000),
+    CreateAt DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
+);
+
 CREATE TABLE TemplateProvider (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     ProviderName NVARCHAR(255) NOT NULL,
@@ -86,6 +96,7 @@ CREATE TABLE ListTemplate (
     Color NVARCHAR(255),
     Sumary NVARCHAR(255),
     Feature NVARCHAR(255),
+    ListTypeId INT NOT NULL FOREIGN KEY REFERENCES ListType(Id),
     TemplateProviderId INT NOT NULL FOREIGN KEY REFERENCES TemplateProvider(Id),
     CreateAt DATETIME NOT NULL DEFAULT GETDATE(),
     UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
@@ -167,21 +178,12 @@ CREATE TABLE TemplateSampleCell (
     UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
 );
 
-CREATE TABLE ListType (
-    Id INT IDENTITY(1,1) PRIMARY KEY,
-    Title NVARCHAR(255) NOT NULL,
-    Icon NVARCHAR(100),
-    HeaderImage NVARCHAR(255),
-    ListTypeDescription NVARCHAR(1000),
-    CreateAt DATETIME NOT NULL DEFAULT GETDATE(),
-    UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
-);
-
 CREATE TABLE List (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     ListName NVARCHAR(255) NOT NULL,
     Icon NVARCHAR(255) NOT NULL,
     Color NVARCHAR(255) NOT NULL,
+    ListTypeId INT NOT NULL FOREIGN KEY REFERENCES ListType(Id),
     WorkspaceId INT NOT NULL FOREIGN KEY REFERENCES Workspace(Id),
     TemplateId INT NOT NULL FOREIGN KEY REFERENCES ListTemplate(Id),
     CreatedBy INT NOT NULL FOREIGN KEY REFERENCES Account(Id),
