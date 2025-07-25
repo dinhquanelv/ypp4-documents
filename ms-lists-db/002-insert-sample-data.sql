@@ -65,6 +65,15 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
+-- Insert into ListType 
+INSERT INTO ListType (Title, Icon, HeaderImage, ListTypeDescription)
+VALUES
+('List', 'list_icon', 'http://example.com/images/list_header.png', 'Categorize items, track, assign and more.'),
+('Form', 'form_icon', 'http://example.com/images/form_header.png', 'Collect structured data via form submissions.'),
+('Gallery', 'gallery_icon', 'http://example.com/images/gallery_header.png', 'Visual display of items in card format.'),
+('Calendar', 'calendar_icon', 'http://example.com/images/calendar_header.png', 'Manage and schedule time-based events.'),
+('Board', 'board_icon', 'http://example.com/images/board_header.png', 'Organize items using Kanban-style workflow.');
+
 -- Insert into TemplateProvider (1000 rows)
 INSERT INTO TemplateProvider (ProviderName)
 VALUES ('Microsoft'), ('Company');
@@ -73,6 +82,7 @@ VALUES ('Microsoft'), ('Company');
 SET @Counter = 1;
 WHILE @Counter <= 1000
 BEGIN
+    DECLARE @ListTypeId_LT INT = (SELECT TOP 1 Id FROM ListType ORDER BY NEWID());
     DECLARE @TemplateProviderId_LT INT = (SELECT TOP 1 Id FROM TemplateProvider ORDER BY NEWID());
     DECLARE @Title_LT NVARCHAR(255) = 'Template ' + CAST(@Counter AS NVARCHAR(10));
     DECLARE @HeaderImage_LT NVARCHAR(255) = 'http://example.com/images/template' + CAST(@Counter AS NVARCHAR(10)) + '.png';
@@ -82,8 +92,8 @@ BEGIN
     DECLARE @Sumary_LT NVARCHAR(255) = 'Summary ' + CAST(@Counter AS NVARCHAR(10));
     DECLARE @Feature_LT NVARCHAR(255) = 'Feature ' + CAST(@Counter AS NVARCHAR(10));
     SELECT TOP 1 @Color_LT = Color FROM @Colors ORDER BY NEWID();
-    INSERT INTO ListTemplate (Title, HeaderImage, TemplateDescription, Icon, Color, Sumary, Feature, TemplateProviderId)
-    VALUES (@Title_LT, @HeaderImage_LT, @TemplateDescription_LT, @Icon_LT, @Color_LT, @Sumary_LT, @Feature_LT, @TemplateProviderId_LT);
+    INSERT INTO ListTemplate (Title, HeaderImage, TemplateDescription, Icon, Color, Sumary, Feature, ListTypeId,TemplateProviderId)
+    VALUES (@Title_LT, @HeaderImage_LT, @TemplateDescription_LT, @Icon_LT, @Color_LT, @Sumary_LT, @Feature_LT, @ListTypeId_LT, @TemplateProviderId_LT);
     SET @Counter = @Counter + 1;
 END;
 
@@ -190,19 +200,11 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
--- Insert into ListType 
-INSERT INTO ListType (Title, Icon, HeaderImage, ListTypeDescription)
-VALUES
-('List', 'list_icon', 'http://example.com/images/list_header.png', 'Categorize items, track, assign and more.'),
-('Form', 'form_icon', 'http://example.com/images/form_header.png', 'Collect structured data via form submissions.'),
-('Gallery', 'gallery_icon', 'http://example.com/images/gallery_header.png', 'Visual display of items in card format.'),
-('Calendar', 'calendar_icon', 'http://example.com/images/calendar_header.png', 'Manage and schedule time-based events.'),
-('Board', 'board_icon', 'http://example.com/images/board_header.png', 'Organize items using Kanban-style workflow.');
-
 -- Insert into List (1000 rows)
 SET @Counter = 1;
 WHILE @Counter <= 1000
 BEGIN
+DECLARE @ListTypeId_L INT = (SELECT TOP 1 Id FROM ListType ORDER BY NEWID());
     DECLARE @ListName_L NVARCHAR(255);
     DECLARE @Icon_L NVARCHAR(255) = 'icon' + CAST(@Counter AS NVARCHAR(10));
     DECLARE @Color_L NVARCHAR(255);
@@ -211,8 +213,8 @@ BEGIN
     DECLARE @CreatedBy_L INT = (SELECT TOP 1 Id FROM Account ORDER BY NEWID());
     SELECT TOP 1 @ListName_L = Name + ' ' + CAST(@Counter AS NVARCHAR(10)) FROM @ListNames ORDER BY NEWID();
     SELECT TOP 1 @Color_L = Color FROM @Colors ORDER BY NEWID();
-    INSERT INTO List (ListName, Icon, Color, WorkspaceId, TemplateId, CreatedBy)
-    VALUES (@ListName_L, @Icon_L, @Color_L, @WorkspaceId_L, @TemplateId_L, @CreatedBy_L);
+    INSERT INTO List (ListName, Icon, Color, ListTypeId, WorkspaceId, TemplateId, CreatedBy)
+    VALUES (@ListName_L, @Icon_L, @Color_L, @ListTypeId_L, @WorkspaceId_L, @TemplateId_L, @CreatedBy_L);
     SET @Counter = @Counter + 1;
 END;
 

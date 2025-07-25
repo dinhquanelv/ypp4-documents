@@ -1,48 +1,8 @@
 USE MSListsV12;
 GO
 
-SELECT * FROM Account;
-SELECT * FROM Workspace;
-SELECT * FROM WorkspaceMember;
-SELECT * FROM TemplateProvider;
-SELECT * FROM ListTemplate;
-SELECT * FROM ViewType;
-SELECT * FROM ViewSetting;
-SELECT * FROM ViewTypeSetting;
-SELECT * FROM TemplateView;
-SELECT * FROM TemplateColumn;
-SELECT * FROM TemplateViewSetting;
-SELECT * FROM TemplateSampleRow;
-SELECT * FROM TemplateSampleCell;
-SELECT * FROM ListType;
-SELECT * FROM List;
-SELECT * FROM FavoriteList;
-SELECT * FROM ListView;
-SELECT * FROM SystemDataType;
-SELECT * FROM KeySetting;
-SELECT * FROM DataTypeSettingKey;
-SELECT * FROM ListDynamicColumn;
-SELECT * FROM ListColumnSettingValue;
-SELECT * FROM ListViewSetting;
-SELECT * FROM ListColumnSettingObject;
-SELECT * FROM ListRow;
-SELECT * FROM ListCellValue;
-SELECT * FROM ListRowComment;
-SELECT * FROM Permission;
-SELECT * FROM ListMemberPermission;
-SELECT * FROM Scope;
-SELECT * FROM ShareLink;
-SELECT * FROM ShareLinkUserAccess;
-SELECT * FROM FileAttachment;
-SELECT * FROM TrashItem;
-GO
-
--- screen 1: dashboard
--- case 1: find Account by Id
-SELECT a.FirstName, a.LastName, a.Email, a.Avatar, a.Company 
-FROM Account a WHERE a.Id = 1
-
--- case 2: favorites list from user
+-- screen 1: dashboard & account
+-- case 1: favorites list from user
 SELECT l.Icon, l.Color, w.WorkspaceName, l.ListName
 FROM List l
 JOIN FavoriteList fl ON fl.Id = l.Id
@@ -50,19 +10,23 @@ JOIN Account a ON a.Id = fl.ListId
 JOIN Workspace w ON w.Id = l.WorkspaceId
 WHERE a.Id = 2
 
--- case 3: find recents list from user
+-- case 2: find recents list from user
 SELECT l.ListName, l.Icon, w.WorkspaceName, l.CreateAt
 FROM List l
 JOIN Account a ON a.Id = l.CreatedBy
 JOIN Workspace w ON w.Id = l.WorkspaceId
 WHERE a.Id = 2
 
--- case 4: find all list from user
+-- case 3: find all list from user
 SELECT l.ListName, l.Icon, w.WorkspaceName
 FROM List l
 JOIN Account a ON a.Id = l.CreatedBy
 JOIN Workspace w ON w.Id = l.WorkspaceId
 WHERE a.Id = 2
+
+-- case 4: find Account by Id
+SELECT a.FirstName, a.LastName, a.Email, a.Avatar, a.Company 
+FROM Account a WHERE a.Id = 1
 
 -- screen 2: create list screen (when user choose create new)
 -- case 1: show list type
@@ -75,7 +39,7 @@ FROM ListTemplate lt
 JOIN TemplateProvider tp ON tp.Id = lt.TemplateProviderId
 WHERE tp.ProviderName = 'Microsoft'
 
--- sreen 3: when user choose template
+-- screen 3: when user choose template
 -- case 1: find list template by id
 SELECT lt.Id, 
 	lt.Icon, lt.Title, 
@@ -152,7 +116,7 @@ JOIN SystemDataType sdt ON sdt.Id = ldc.SystemDataTypeId
 JOIN List l ON l.Id = ldc.ListId
 WHERE l.Id = 299
 
--- screen 5: add new item
+-- screen 6: add new item
 -- case 1: show info column
 SELECT sdt.Icon, ldc.ColumnName, sdt.DataTypeValue
 FROM ListDynamicColumn ldc
