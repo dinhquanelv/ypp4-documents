@@ -168,3 +168,146 @@ LEFT JOIN ListColumnSettingValue lcsv
 	ON lcsv.ColumnId = ldc.Id AND lcsv.DataTypeSettingKeyId = dtsk.Id
 JOIN KeySetting ks ON ks.Id = dtsk.KeySettingId
 WHERE ldc.Id = 2
+
+-- screen 8: share link
+-- case 1: link setting
+SELECT ListName
+FROM List
+WHERE Id = 14
+
+SELECT ScopeIcon, ScopeName, ScopeDescription, ScopeCode
+FROM Scope 
+
+SELECT PermissionIcon, PermissionName, PermissionDescription, PermissionCode
+FROM Permission 
+
+-- case 2: link setting detail
+SELECT TOP 30 Avatar, FirstName, LastName, Email
+FROM Account
+
+SELECT PermissionIcon, PermissionName, PermissionDescription, PermissionCode
+FROM Permission 
+
+-- case 3: manage access
+SELECT COUNT(*) AS People
+FROM ListMemberPermission lmp
+JOIN List l ON l.Id = lmp.ListId
+JOIN Permission p ON p.Id = lmp.HighestPermissionId
+JOIN Account a ON a.Id = lmp.AccountId
+WHERE l.Id = 14
+
+SELECT l.ListName, a.Avatar, a.FirstName, a.LastName, 
+	a.Email, p.PermissionIcon, p.PermissionName
+FROM ListMemberPermission lmp
+JOIN List l ON l.Id = lmp.ListId
+JOIN Permission p ON p.Id = lmp.HighestPermissionId
+JOIN Account a ON a.Id = lmp.AccountId
+WHERE l.Id = 14
+
+-- screen 9: trash items
+-- case 1: default
+SELECT TOP 20 
+	ti.ObjectName,
+	FORMAT(ti.DeleteAt, 'M/d/yyyy h:mm tt') AS DateDeleted,
+	deleter.FirstName + ' ' + deleter.LastName AS DeletedBy,
+	creator.FirstName + ' ' + creator.LastName AS CreatedBy,
+	ti.PathItem AS OriginalLocation
+FROM TrashItem ti
+JOIN Account creator ON creator.Id = ti.CreateBy 
+JOIN Account deleter ON deleter.Id = ti.DeletedBy 
+
+-- case 2: sort A-Z ObjectName
+SELECT TOP 20 
+	ti.ObjectName,
+	FORMAT(ti.DeleteAt, 'M/d/yyyy h:mm tt') AS DateDeleted,
+	deleter.FirstName + ' ' + deleter.LastName AS DeletedBy,
+	creator.FirstName + ' ' + creator.LastName AS CreatedBy,
+	ti.PathItem AS OriginalLocation
+FROM TrashItem ti
+JOIN Account creator ON creator.Id = ti.CreateBy 
+JOIN Account deleter ON deleter.Id = ti.DeletedBy
+ORDER BY ti.ObjectName ASC;
+
+-- case 3: sort Z-A ObjectName
+SELECT TOP 20 
+	ti.ObjectName,
+	FORMAT(ti.DeleteAt, 'M/d/yyyy h:mm tt') AS DateDeleted,
+	deleter.FirstName + ' ' + deleter.LastName AS DeletedBy,
+	creator.FirstName + ' ' + creator.LastName AS CreatedBy,
+	ti.PathItem AS OriginalLocation
+FROM TrashItem ti
+JOIN Account creator ON creator.Id = ti.CreateBy 
+JOIN Account deleter ON deleter.Id = ti.DeletedBy
+ORDER BY ti.ObjectName DESC;
+
+-- case 4: sort A-Z DeletedBy
+SELECT TOP 20 
+	ti.ObjectName,
+	FORMAT(ti.DeleteAt, 'M/d/yyyy h:mm tt') AS DateDeleted,
+	deleter.FirstName + ' ' + deleter.LastName AS DeletedBy,
+	creator.FirstName + ' ' + creator.LastName AS CreatedBy,
+	ti.PathItem AS OriginalLocation
+FROM TrashItem ti
+JOIN Account creator ON creator.Id = ti.CreateBy 
+JOIN Account deleter ON deleter.Id = ti.DeletedBy
+ORDER BY deleter.FirstName + ' ' + deleter.LastName ASC;
+
+-- case 5: sort Z-A DeletedBy
+SELECT TOP 20 
+	ti.ObjectName,
+	FORMAT(ti.DeleteAt, 'M/d/yyyy h:mm tt') AS DateDeleted,
+	deleter.FirstName + ' ' + deleter.LastName AS DeletedBy,
+	creator.FirstName + ' ' + creator.LastName AS CreatedBy,
+	ti.PathItem AS OriginalLocation
+FROM TrashItem ti
+JOIN Account creator ON creator.Id = ti.CreateBy 
+JOIN Account deleter ON deleter.Id = ti.DeletedBy
+ORDER BY deleter.FirstName + ' ' + deleter.LastName DESC;
+
+-- case 6: sort A-Z CreatedBy
+SELECT TOP 20 
+	ti.ObjectName,
+	FORMAT(ti.DeleteAt, 'M/d/yyyy h:mm tt') AS DateDeleted,
+	deleter.FirstName + ' ' + deleter.LastName AS DeletedBy,
+	creator.FirstName + ' ' + creator.LastName AS CreatedBy,
+	ti.PathItem AS OriginalLocation
+FROM TrashItem ti
+JOIN Account creator ON creator.Id = ti.CreateBy 
+JOIN Account deleter ON deleter.Id = ti.DeletedBy
+ORDER BY creator.FirstName + ' ' + creator.LastName ASC;
+
+-- case 7: sort Z-A CreatedBy
+SELECT TOP 20 
+	ti.ObjectName,
+	FORMAT(ti.DeleteAt, 'M/d/yyyy h:mm tt') AS DateDeleted,
+	deleter.FirstName + ' ' + deleter.LastName AS DeletedBy,
+	creator.FirstName + ' ' + creator.LastName AS CreatedBy,
+	ti.PathItem AS OriginalLocation
+FROM TrashItem ti
+JOIN Account creator ON creator.Id = ti.CreateBy 
+JOIN Account deleter ON deleter.Id = ti.DeletedBy
+ORDER BY creator.FirstName + ' ' + creator.LastName DESC;
+
+-- case 8: sort DeleteAt Oldest -> Newest
+SELECT TOP 20 
+	ti.ObjectName,
+	FORMAT(ti.DeleteAt, 'M/d/yyyy h:mm tt') AS DateDeleted,
+	deleter.FirstName + ' ' + deleter.LastName AS DeletedBy,
+	creator.FirstName + ' ' + creator.LastName AS CreatedBy,
+	ti.PathItem AS OriginalLocation
+FROM TrashItem ti
+JOIN Account creator ON creator.Id = ti.CreateBy 
+JOIN Account deleter ON deleter.Id = ti.DeletedBy
+ORDER BY ti.DeleteAt ASC;
+
+-- case 9: sort DeleteAt Newest -> Oldest
+SELECT TOP 20 
+	ti.ObjectName,
+	FORMAT(ti.DeleteAt, 'M/d/yyyy h:mm tt') AS DateDeleted,
+	deleter.FirstName + ' ' + deleter.LastName AS DeletedBy,
+	creator.FirstName + ' ' + creator.LastName AS CreatedBy,
+	ti.PathItem AS OriginalLocation
+FROM TrashItem ti
+JOIN Account creator ON creator.Id = ti.CreateBy 
+JOIN Account deleter ON deleter.Id = ti.DeletedBy
+ORDER BY ti.DeleteAt DESC;

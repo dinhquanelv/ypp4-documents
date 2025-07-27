@@ -1,6 +1,42 @@
 ﻿USE MSListsV12;
 GO
 
+-- if data exist clear data before insert new data
+IF EXISTS (SELECT 1 FROM TrashItem) BEGIN DELETE FROM TrashItem; DBCC CHECKIDENT ('TrashItem', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM FileAttachment) BEGIN DELETE FROM FileAttachment; DBCC CHECKIDENT ('FileAttachment', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ShareLinkUserAccess) BEGIN DELETE FROM ShareLinkUserAccess; DBCC CHECKIDENT ('ShareLinkUserAccess', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ShareLink) BEGIN DELETE FROM ShareLink; DBCC CHECKIDENT ('ShareLink', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM Scope) BEGIN DELETE FROM Scope; DBCC CHECKIDENT ('Scope', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListMemberPermission) BEGIN DELETE FROM ListMemberPermission; DBCC CHECKIDENT ('ListMemberPermission', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM Permission) BEGIN DELETE FROM Permission; DBCC CHECKIDENT ('Permission', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListRowComment) BEGIN DELETE FROM ListRowComment; DBCC CHECKIDENT ('ListRowComment', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListCellValue) BEGIN DELETE FROM ListCellValue; DBCC CHECKIDENT ('ListCellValue', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListRow) BEGIN DELETE FROM ListRow; DBCC CHECKIDENT ('ListRow', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListColumnSettingObject) BEGIN DELETE FROM ListColumnSettingObject; DBCC CHECKIDENT ('ListColumnSettingObject', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListViewSetting) BEGIN DELETE FROM ListViewSetting; DBCC CHECKIDENT ('ListViewSetting', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListColumnSettingValue) BEGIN DELETE FROM ListColumnSettingValue; DBCC CHECKIDENT ('ListColumnSettingValue', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListDynamicColumn) BEGIN DELETE FROM ListDynamicColumn; DBCC CHECKIDENT ('ListDynamicColumn', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListView) BEGIN DELETE FROM ListView; DBCC CHECKIDENT ('ListView', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM FavoriteList) BEGIN DELETE FROM FavoriteList; DBCC CHECKIDENT ('FavoriteList', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM List) BEGIN DELETE FROM List; DBCC CHECKIDENT ('List', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM TemplateSampleCell) BEGIN DELETE FROM TemplateSampleCell; DBCC CHECKIDENT ('TemplateSampleCell', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM TemplateSampleRow) BEGIN DELETE FROM TemplateSampleRow; DBCC CHECKIDENT ('TemplateSampleRow', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM TemplateViewSetting) BEGIN DELETE FROM TemplateViewSetting; DBCC CHECKIDENT ('TemplateViewSetting', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM TemplateColumn) BEGIN DELETE FROM TemplateColumn; DBCC CHECKIDENT ('TemplateColumn', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM DataTypeSettingKey) BEGIN DELETE FROM DataTypeSettingKey; DBCC CHECKIDENT ('DataTypeSettingKey', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM KeySetting) BEGIN DELETE FROM KeySetting; DBCC CHECKIDENT ('KeySetting', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM SystemDataType) BEGIN DELETE FROM SystemDataType; DBCC CHECKIDENT ('SystemDataType', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM TemplateView) BEGIN DELETE FROM TemplateView; DBCC CHECKIDENT ('TemplateView', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ViewTypeSetting) BEGIN DELETE FROM ViewTypeSetting; DBCC CHECKIDENT ('ViewTypeSetting', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ViewSetting) BEGIN DELETE FROM ViewSetting; DBCC CHECKIDENT ('ViewSetting', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ViewType) BEGIN DELETE FROM ViewType; DBCC CHECKIDENT ('ViewType', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListTemplate) BEGIN DELETE FROM ListTemplate; DBCC CHECKIDENT ('ListTemplate', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM TemplateProvider) BEGIN DELETE FROM TemplateProvider; DBCC CHECKIDENT ('TemplateProvider', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListType) BEGIN DELETE FROM ListType; DBCC CHECKIDENT ('ListType', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM WorkspaceMember) BEGIN DELETE FROM WorkspaceMember; DBCC CHECKIDENT ('WorkspaceMember', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM Workspace) BEGIN DELETE FROM Workspace; DBCC CHECKIDENT ('Workspace', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM Account) BEGIN DELETE FROM Account; DBCC CHECKIDENT ('Account', RESEED, 0); END
+
 -- Temporary tables for reusable data
 DECLARE @FirstNames TABLE (Name NVARCHAR(50));
 DECLARE @LastNames TABLE (Name NVARCHAR(50));
@@ -62,6 +98,17 @@ BEGIN
     SELECT TOP 1 @WorkspaceName_WS = Name + ' ' + CAST(@Counter AS NVARCHAR(10)) FROM @WorkspaceNames ORDER BY NEWID();
     INSERT INTO Workspace (WorkspaceName)
     VALUES (@WorkspaceName_WS);
+    SET @Counter = @Counter + 1;
+END;
+
+-- Insert into WorkspaceMember (1000 rows)
+SET @Counter = 1;
+WHILE @Counter <= 1000
+BEGIN
+    DECLARE @AccountId_WM INT = (SELECT TOP 1 Id FROM Account ORDER BY NEWID());
+    DECLARE @WorkspaceId_WM INT = (SELECT TOP 1 Id FROM Workspace ORDER BY NEWID());
+    INSERT INTO WorkspaceMember (AccountId, WorkspaceId)
+    VALUES (@AccountId_WM, @WorkspaceId_WM);
     SET @Counter = @Counter + 1;
 END;
 
@@ -145,6 +192,34 @@ VALUES
 ('number_icon', 'Numeric input field', 'http://example.com/images/number.png', 'Number', 'NUMBER'),
 ('date_icon', 'Date picker for calendar input', 'http://example.com/images/date.png', 'Date', 'DATE'),
 ('person_icon', 'Person or user selector', 'http://example.com/images/person.png', 'Person', 'PERSON');
+
+-- Insert into KeySetting
+INSERT INTO KeySetting (KeyName, ValueType, DisplayName, IsDefaultValue, ValueOfDefault)
+VALUES
+('Required', 'BOOLEAN', 'Is Required', 1, 'false'),
+('MaxLength', 'INTEGER', 'Maximum Length', 0, 'false'),
+('MinLength', 'INTEGER', 'Minimum Length', 0, 'false'),
+('MinValue', 'INTEGER', 'Minimum Value', 0, 'false'),
+('MaxValue', 'INTEGER', 'Maximum Value', 0, 'false'),
+('DefaultValue', 'STRING', 'Default Value', 0, 'false'),
+('AllowMultiple', 'BOOLEAN', 'Allow Multiple Selection', 1, 'false'),
+('IsUnique', 'BOOLEAN', 'Must Be Unique', 1, 'false'),
+('LookupSource', 'STRING', 'Lookup Source', 0, 'false'),
+('Regex', 'STRING', 'Regex Validation Pattern', 0, 'false');
+
+-- Insert into DataTypeSettingKey
+INSERT INTO DataTypeSettingKey (SystemDataTypeId, KeySettingId)
+VALUES
+-- Text (1)
+(1, 1), (1, 2), (1, 3), (1, 6), (1, 10), (1, 8),
+-- Choice (2)
+(2, 1), (2, 7), (2, 6), (2, 9),
+-- Number (3)
+(3, 1), (3, 4), (3, 5), (3, 6), (3, 8),
+-- Date (4)
+(4, 1), (4, 6), (4, 4), (4, 5),
+-- Person (5)
+(5, 1), (5, 7), (5, 6);
 
 -- Insert into TemplateColumn (1000 rows)
 SET @Counter = 1;
@@ -242,34 +317,6 @@ BEGIN
     VALUES (@ListId_LV, @ViewName_LV, @ViewTypeId_LV, @CreatedBy_LV);
     SET @Counter = @Counter + 1;
 END;
-
--- Insert into KeySetting
-INSERT INTO KeySetting (KeyName, ValueType, DisplayName, IsDefaultValue, ValueOfDefault)
-VALUES
-('Required', 'BOOLEAN', 'Is Required', 1, 'false'),
-('MaxLength', 'INTEGER', 'Maximum Length', 0, 'false'),
-('MinLength', 'INTEGER', 'Minimum Length', 0, 'false'),
-('MinValue', 'INTEGER', 'Minimum Value', 0, 'false'),
-('MaxValue', 'INTEGER', 'Maximum Value', 0, 'false'),
-('DefaultValue', 'STRING', 'Default Value', 0, 'false'),
-('AllowMultiple', 'BOOLEAN', 'Allow Multiple Selection', 1, 'false'),
-('IsUnique', 'BOOLEAN', 'Must Be Unique', 1, 'false'),
-('LookupSource', 'STRING', 'Lookup Source', 0, 'false'),
-('Regex', 'STRING', 'Regex Validation Pattern', 0, 'false');
-
--- Insert into DataTypeSettingKey
-INSERT INTO DataTypeSettingKey (SystemDataTypeId, KeySettingId)
-VALUES
--- Text (1)
-(1, 1), (1, 2), (1, 3), (1, 6), (1, 10), (1, 8),
--- Choice (2)
-(2, 1), (2, 7), (2, 6), (2, 9),
--- Number (3)
-(3, 1), (3, 4), (3, 5), (3, 6), (3, 8),
--- Date (4)
-(4, 1), (4, 6), (4, 4), (4, 5),
--- Person (5)
-(5, 1), (5, 7), (5, 6);
 
 -- Insert into ListDynamicColumn (1000 rows)
 SET @Counter = 1;
@@ -379,21 +426,11 @@ BEGIN
 END;
 
 -- Insert into Permission (1000 rows)
-SET @Counter = 1;
-DECLARE @BasePermissions TABLE (PermissionName_Perm NVARCHAR(100), PermissionCode_Perm NVARCHAR(50));
-INSERT INTO @BasePermissions VALUES
-('Read', 'READ'), ('Contribute', 'CONTRIBUTE'), ('Edit', 'EDIT'), ('Full Control', 'FULL_CONTROL'), ('View Only', 'VIEW_ONLY');
-WHILE @Counter <= 1000
-BEGIN
-    DECLARE @PermissionName_Perm NVARCHAR(100);
-    DECLARE @PermissionCode_Perm NVARCHAR(50);
-    SELECT TOP 1 @PermissionName_Perm = PermissionName_Perm + ' ' + CAST(@Counter AS NVARCHAR(10)),
-                 @PermissionCode_Perm = PermissionCode_Perm + '_' + CAST(@Counter AS NVARCHAR(10))
-    FROM @BasePermissions ORDER BY NEWID();
-    INSERT INTO Permission (PermissionName, PermissionCode)
-    VALUES (@PermissionName_Perm, @PermissionCode_Perm);
-    SET @Counter = @Counter + 1;
-END;
+INSERT INTO Permission (PermissionCode, PermissionName, PermissionIcon, PermissionDescription)
+VALUES 
+('OWNER', 'Can edit list', 'Owner Icon', 'Can edit, add, or remove items, columns or views'),
+('CONTRIBUTOR', 'Can edit items', 'Contributor Icon', 'Can edit,  add, or remove items'),
+('READER', 'Can view', 'Reader Icon', 'Can''t edit or share items or this list');
 
 -- Insert into ListMemberPermission (1000 rows)
 SET @Counter = 1;
@@ -408,17 +445,11 @@ BEGIN
 END;
 
 -- Insert into Scope (1000 rows)
-SET @Counter = 1;
-WHILE @Counter <= 1000
-BEGIN
-    DECLARE @Code_Scope NVARCHAR(50) = 'SCOPE_' + CAST(@Counter AS NVARCHAR(10));
-    DECLARE @ScopeName_Scope NVARCHAR(100) = 'Scope ' + CAST(@Counter AS NVARCHAR(10));
-    DECLARE @ScopeDescription_Scope NVARCHAR(255) = 'Description for scope ' + CAST(@Counter AS NVARCHAR(10));
-    DECLARE @Icon_Scope NVARCHAR(255) = 'icon' + CAST(@Counter AS NVARCHAR(10));
-    INSERT INTO Scope (Code, ScopeName, ScopeDescription, Icon)
-    VALUES (@Code_Scope, @ScopeName_Scope, @ScopeDescription_Scope, @Icon_Scope);
-    SET @Counter = @Counter + 1;
-END;
+INSERT INTO Scope (ScopeCode, ScopeName, ScopeIcon, ScopeDescription)
+VALUES 
+('PUBLIC', 'Anyone', 'Public Icon', 'Public Description'),
+('AUTHORIZED', 'Only people with existing access', 'Authorized Icon', 'Authorized Description'),
+('SPECIFIC', 'People you choose', 'Specific Icon', 'Specific Description');
 
 -- Insert into ShareLink (1000 rows)
 SET @Counter = 1;
@@ -468,7 +499,7 @@ BEGIN
     DECLARE @ObjectId_TI INT = (SELECT TOP 1 Id FROM ListColumnSettingObject ORDER BY NEWID());
     DECLARE @CreateBy_TI INT = (SELECT TOP 1 Id FROM Account ORDER BY NEWID());
     DECLARE @DeletedBy_TI INT = (SELECT TOP 1 Id FROM Account ORDER BY NEWID());
-    DECLARE @ObjectType_TI NVARCHAR(100) = 'Choice';
+    DECLARE @ObjectType_TI NVARCHAR(100) = 'File';
     DECLARE @ObjectName_TI NVARCHAR(100) = 'Deleted Item ' + CAST(@Counter AS NVARCHAR(10));
     DECLARE @ObjectStatus_TI NVARCHAR(100) = CASE WHEN @Counter % 2 = 0 THEN 'Deleted' ELSE 'Archived' END;
     DECLARE @PathItem_TI NVARCHAR(255) = '/trash/item' + CAST(@Counter AS NVARCHAR(10));
@@ -479,15 +510,3 @@ BEGIN
     END;
     SET @Counter = @Counter + 1;
 END;
-
--- Insert into WorkspaceMember (1000 rows)
-SET @Counter = 1;
-WHILE @Counter <= 1000
-BEGIN
-    DECLARE @AccountId_WM INT = (SELECT TOP 1 Id FROM Account ORDER BY NEWID());
-    DECLARE @WorkspaceId_WM INT = (SELECT TOP 1 Id FROM Workspace ORDER BY NEWID());
-    INSERT INTO WorkspaceMember (AccountId, WorkspaceId)
-    VALUES (@AccountId_WM, @WorkspaceId_WM);
-    SET @Counter = @Counter + 1;
-END;
-GO
