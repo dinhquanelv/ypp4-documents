@@ -3,6 +3,7 @@ GO
 
 -- if data exist clear data before insert new data
 IF EXISTS (SELECT 1 FROM TrashItem) BEGIN DELETE FROM TrashItem; DBCC CHECKIDENT ('TrashItem', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ObjectType) BEGIN DELETE FROM ObjectType; DBCC CHECKIDENT ('ObjectType', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM FileAttachment) BEGIN DELETE FROM FileAttachment; DBCC CHECKIDENT ('FileAttachment', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ShareLinkUserAccess) BEGIN DELETE FROM ShareLinkUserAccess; DBCC CHECKIDENT ('ShareLinkUserAccess', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ShareLink) BEGIN DELETE FROM ShareLink; DBCC CHECKIDENT ('ShareLink', RESEED, 0); END
@@ -16,6 +17,8 @@ IF EXISTS (SELECT 1 FROM ListColumnSettingObject) BEGIN DELETE FROM ListColumnSe
 IF EXISTS (SELECT 1 FROM ListViewSetting) BEGIN DELETE FROM ListViewSetting; DBCC CHECKIDENT ('ListViewSetting', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListColumnSettingValue) BEGIN DELETE FROM ListColumnSettingValue; DBCC CHECKIDENT ('ListColumnSettingValue', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListDynamicColumn) BEGIN DELETE FROM ListDynamicColumn; DBCC CHECKIDENT ('ListDynamicColumn', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM SystemColumnSettingValue) BEGIN DELETE FROM SystemColumnSettingValue; DBCC CHECKIDENT ('SystemColumnSettingValue', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM SystemColumn) BEGIN DELETE FROM SystemColumn; DBCC CHECKIDENT ('SystemColumn', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListView) BEGIN DELETE FROM ListView; DBCC CHECKIDENT ('ListView', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM FavoriteList) BEGIN DELETE FROM FavoriteList; DBCC CHECKIDENT ('FavoriteList', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM List) BEGIN DELETE FROM List; DBCC CHECKIDENT ('List', RESEED, 0); END
@@ -96,8 +99,8 @@ WHILE @Counter <= 1000
 BEGIN
     DECLARE @WorkspaceName_WS NVARCHAR(255);
     SELECT TOP 1 @WorkspaceName_WS = Name + ' ' + CAST(@Counter AS NVARCHAR(10)) FROM @WorkspaceNames ORDER BY NEWID();
-    INSERT INTO Workspace (WorkspaceName)
-    VALUES (@WorkspaceName_WS);
+    INSERT INTO Workspace (WorkspaceName, Icon)
+    VALUES (@WorkspaceName_WS, 'workspace_icon');
     SET @Counter = @Counter + 1;
 END;
 
@@ -318,6 +321,48 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
+-- Insert into SystemColumn (1000 rows)
+INSERT INTO SystemColumn (ColumnName, ColumnDescription, DisplayOrder, SystemDataTypeId) 
+VALUES 
+('Title', 'Main title field', 1, 1),
+('Compliance Asset Id', 'Compliance tracking ID', 2, 1),
+('ID', 'System-generated unique ID', 3, 3),
+('Modified', 'Date item was last modified', 4, 4),
+('Created', 'Date item was created', 5, 4),
+('Created By', 'User who created the item', 6, 5),
+('Modified By', 'User who last modified the item', 7, 5),
+('Attachments', 'Indicates if item has file attachments', 8, 2),
+('Type', 'Type of item', 9, 2),
+('Item Child Count', 'Number of child items', 10, 3),
+('Folder Child Count', 'Number of child folders', 11, 3),
+('Label setting', 'Label configuration', 12, 1),
+('Retention label', 'Label for data retention', 13, 2),
+('Retention label Applied', 'Indicates retention applied', 14, 2),
+('Label applied by', 'Who applied the label', 15, 5),
+('Item is a Record', 'Whether item is a record', 16, 2);
+
+-- Insert into SystemColumnSettingValue (1000 rows)
+INSERT INTO SystemColumnSettingValue (ColumnId, DataTypeSettingKeyId, KeyValue)
+VALUES 
+-- Text Column (ColumnId = 1)
+(1, 1, 'true'),     -- Required
+(1, 2, 'left'),     -- Alignment
+(1, 3, '20'),       -- MaxLength
+-- Choice Column (ColumnId = 2)
+(2, 4, 'true'),     -- Required
+(2, 5, 'dropdown'), -- Display Type
+-- Number Column (ColumnId = 3)
+(3, 6, 'true'),     -- Required
+(3, 7, '0'),        -- Min
+(3, 8, '100'),      -- Max
+-- Date Column (ColumnId = 4)
+(4, 11, 'true'),        -- Required
+(4, 12, '2024-01-01'),  -- Min
+(4, 13, '2025-01-01'),  -- Max
+-- Person Column (ColumnId = 5)
+(5, 15, 'true'),        -- Required
+(5, 16, 'avatarOnly');  -- Display Type
+
 -- Insert into ListDynamicColumn (1000 rows)
 SET @Counter = 1;
 WHILE @Counter <= 1000
@@ -455,6 +500,7 @@ VALUES
 SET @Counter = 1;
 WHILE @Counter <= 1000
 BEGIN
+    DECLARE @ListId_SL INT = (SELECT TOP 1 Id FROM List ORDER BY NEWID());
     DECLARE @ScopeId_SL INT = (SELECT TOP 1 Id FROM Scope ORDER BY NEWID());
     DECLARE @PermissionId_SL INT = (SELECT TOP 1 Id FROM Permission ORDER BY NEWID());
     DECLARE @CreatedBy_SL INT = (SELECT TOP 1 Id FROM Account ORDER BY NEWID());
@@ -462,8 +508,8 @@ BEGIN
     DECLARE @Note_SL NVARCHAR(500) = 'Note for link ' + CAST(@Counter AS NVARCHAR(10));
     DECLARE @ExpirationDate_SL DATETIME = DATEADD(DAY, @Counter % 365, GETDATE());
     DECLARE @LinkPassword_SL NVARCHAR(255) = CASE WHEN @Counter % 2 = 0 THEN 'pass' + CAST(@Counter AS NVARCHAR(10)) ELSE NULL END;
-    INSERT INTO ShareLink (TargetUrl, IsPublic, ScopeId, PermissionId, Note, ExpirationDate, IsLoginRequired, LinkPassword, CreatedBy)
-    VALUES (@TargetUrl_SL, @Counter % 2, @ScopeId_SL, @PermissionId_SL, @Note_SL, @ExpirationDate_SL, @Counter % 2, @LinkPassword_SL, @CreatedBy_SL);
+    INSERT INTO ShareLink (TargetUrl, ListId, ScopeId, PermissionId, Note, ExpirationDate, IsLoginRequired, LinkPassword, CreatedBy)
+    VALUES (@TargetUrl_SL, @ListId_SL, @ScopeId_SL, @PermissionId_SL, @Note_SL, @ExpirationDate_SL, @Counter % 2, @LinkPassword_SL, @CreatedBy_SL);
     SET @Counter = @Counter + 1;
 END;
 
@@ -492,11 +538,17 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
+INSERT INTO ObjectType (ObjectCode, ObjectName, ObjectIcon) VALUES
+('FILE', 'File', 'file_icon'),
+('LIST', 'List', 'list_icon'),
+('LISTROW', 'List Row', 'list_row_icon');
+
 -- Insert into TrashItem (1000 rows)
 SET @Counter = 1;
 WHILE @Counter <= 1000
 BEGIN
     DECLARE @ObjectId_TI INT = (SELECT TOP 1 Id FROM ListColumnSettingObject ORDER BY NEWID());
+    DECLARE @ObjectTypeId_TI INT = (SELECT TOP 1 Id FROM ObjectType ORDER BY NEWID());
     DECLARE @CreateBy_TI INT = (SELECT TOP 1 Id FROM Account ORDER BY NEWID());
     DECLARE @DeletedBy_TI INT = (SELECT TOP 1 Id FROM Account ORDER BY NEWID());
     DECLARE @ObjectType_TI NVARCHAR(100) = 'File';
@@ -505,8 +557,8 @@ BEGIN
     DECLARE @PathItem_TI NVARCHAR(255) = '/trash/item' + CAST(@Counter AS NVARCHAR(10));
     IF @ObjectId_TI IS NOT NULL
     BEGIN
-        INSERT INTO TrashItem (ObjectId, ObjectType, ObjectName, ObjectStatus, PathItem, CreateBy, DeletedBy, DeleteAt)
-        VALUES (@ObjectId_TI, @ObjectType_TI, @ObjectName_TI, @ObjectStatus_TI, @PathItem_TI, @CreateBy_TI, @DeletedBy_TI, GETDATE());
+        INSERT INTO TrashItem (ObjectId, ObjectTypeId, PathItem, CreateBy, DeletedBy, DeleteAt)
+        VALUES (@ObjectId_TI, @ObjectTypeId_TI, @PathItem_TI, @CreateBy_TI, @DeletedBy_TI, GETDATE());
     END;
     SET @Counter = @Counter + 1;
 END;

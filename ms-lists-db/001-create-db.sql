@@ -8,6 +8,7 @@ USE MSListsV12;
 GO
 
 IF OBJECT_ID('TrashItem', 'U') IS NOT NULL DROP TABLE TrashItem;
+IF OBJECT_ID('ObjectType', 'U') IS NOT NULL DROP TABLE ObjectType;
 IF OBJECT_ID('FileAttachment', 'U') IS NOT NULL DROP TABLE FileAttachment;
 IF OBJECT_ID('ShareLinkUserAccess', 'U') IS NOT NULL DROP TABLE ShareLinkUserAccess;
 IF OBJECT_ID('ShareLink', 'U') IS NOT NULL DROP TABLE ShareLink;
@@ -21,6 +22,8 @@ IF OBJECT_ID('ListColumnSettingObject', 'U') IS NOT NULL DROP TABLE ListColumnSe
 IF OBJECT_ID('ListViewSetting', 'U') IS NOT NULL DROP TABLE ListViewSetting;
 IF OBJECT_ID('ListColumnSettingValue', 'U') IS NOT NULL DROP TABLE ListColumnSettingValue;
 IF OBJECT_ID('ListDynamicColumn', 'U') IS NOT NULL DROP TABLE ListDynamicColumn;
+IF OBJECT_ID('SystemColumnSettingValue', 'U') IS NOT NULL DROP TABLE SystemColumnSettingValue;
+IF OBJECT_ID('SystemColumn', 'U') IS NOT NULL DROP TABLE SystemColumn;
 IF OBJECT_ID('ListView', 'U') IS NOT NULL DROP TABLE ListView;
 IF OBJECT_ID('FavoriteList', 'U') IS NOT NULL DROP TABLE FavoriteList;
 IF OBJECT_ID('List', 'U') IS NOT NULL DROP TABLE List;
@@ -45,7 +48,7 @@ IF OBJECT_ID('Account', 'U') IS NOT NULL DROP TABLE Account;
 CREATE TABLE Account (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     FirstName NVARCHAR(50) NOT NULL,
-    LastName NVARCHAR(50) NOT NULL,
+    LastName NVARCHAR(100) NOT NULL,
     Email NVARCHAR(100) NOT NULL UNIQUE,
     AccountPassword NVARCHAR(50) NOT NULL,
     Avatar NVARCHAR(255),
@@ -58,6 +61,7 @@ CREATE TABLE Account (
 CREATE TABLE Workspace (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     WorkspaceName NVARCHAR(255) NOT NULL,
+    Icon NVARCHAR(255),
     CreateAt DATETIME NOT NULL DEFAULT GETDATE(),
     UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
 );
@@ -239,6 +243,27 @@ CREATE TABLE ListView (
     UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
 );
 
+CREATE TABLE SystemColumn (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ColumnName NVARCHAR(255) NOT NULL,
+    ColumnDescription NVARCHAR(255) NOT NULL,
+    DisplayOrder INT NOT NULL,
+    SystemDataTypeId INT NOT NULL FOREIGN KEY REFERENCES SystemDataType(Id),
+    IsVisible BIT NOT NULL DEFAULT 0,
+    IsRequired BIT NOT NULL DEFAULT 0,
+    CreateAt DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
+);
+
+CREATE TABLE SystemColumnSettingValue (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ColumnId INT NOT NULL FOREIGN KEY REFERENCES SystemColumn(Id),
+    DataTypeSettingKeyId INT NOT NULL FOREIGN KEY REFERENCES DataTypeSettingKey(Id),
+    KeyValue NVARCHAR(255) NOT NULL,
+    CreateAt DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
+);
+
 CREATE TABLE ListDynamicColumn (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     ListId INT NOT NULL FOREIGN KEY REFERENCES List(Id),
@@ -341,7 +366,7 @@ CREATE TABLE Scope (
 CREATE TABLE ShareLink (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     TargetUrl NVARCHAR(500) NOT NULL,
-    IsPublic BIT NOT NULL DEFAULT 1,
+    ListId INT NOT NULL FOREIGN KEY REFERENCES List(Id),
     ScopeId INT NOT NULL FOREIGN KEY REFERENCES Scope(Id),
     PermissionId INT NOT NULL FOREIGN KEY REFERENCES Permission(Id),
     Note NVARCHAR(500),
@@ -372,12 +397,19 @@ CREATE TABLE FileAttachment (
     UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
 );
 
+CREATE TABLE ObjectType (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ObjectCode NVARCHAR(100),
+    ObjectName NVARCHAR(255),
+    ObjectIcon NVARCHAR(255),
+    DeleteAt DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdateAt DATETIME NOT NULL DEFAULT GETDATE()
+);
+
 CREATE TABLE TrashItem (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     ObjectId INT NOT NULL FOREIGN KEY REFERENCES ListColumnSettingObject(Id),
-    ObjectType NVARCHAR(100),
-    ObjectName NVARCHAR(100),
-    ObjectStatus NVARCHAR(100),
+    ObjectTypeId INT NOT NULL FOREIGN KEY REFERENCES ObjectType(Id),
     PathItem NVARCHAR(255),
     CreateBy INT NOT NULL FOREIGN KEY REFERENCES Account(Id),
     DeletedBy INT NOT NULL FOREIGN KEY REFERENCES Account(Id),
