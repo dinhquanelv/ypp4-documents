@@ -6,6 +6,8 @@ IF EXISTS (SELECT 1 FROM TrashItem) BEGIN DELETE FROM TrashItem; DBCC CHECKIDENT
 IF EXISTS (SELECT 1 FROM ObjectType) BEGIN DELETE FROM ObjectType; DBCC CHECKIDENT ('ObjectType', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM FileAttachment) BEGIN DELETE FROM FileAttachment; DBCC CHECKIDENT ('FileAttachment', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ShareLinkUserAccess) BEGIN DELETE FROM ShareLinkUserAccess; DBCC CHECKIDENT ('ShareLinkUserAccess', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ShareLinkOptionValue) BEGIN DELETE FROM ShareLinkOptionValue; DBCC CHECKIDENT ('ShareLinkOptionValue', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ShareLinkOption) BEGIN DELETE FROM ShareLinkOption; DBCC CHECKIDENT ('ShareLinkOption', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ShareLink) BEGIN DELETE FROM ShareLink; DBCC CHECKIDENT ('ShareLink', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM Scope) BEGIN DELETE FROM Scope; DBCC CHECKIDENT ('Scope', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListMemberPermission) BEGIN DELETE FROM ListMemberPermission; DBCC CHECKIDENT ('ListMemberPermission', RESEED, 0); END
@@ -124,7 +126,7 @@ VALUES
 ('Calendar', 'calendar_icon', 'http://example.com/images/calendar_header.png', 'Manage and schedule time-based events.'),
 ('Board', 'board_icon', 'http://example.com/images/board_header.png', 'Organize items using Kanban-style workflow.');
 
--- Insert into TemplateProvider (1000 rows)
+-- Insert into TemplateProvider
 INSERT INTO TemplateProvider (ProviderName)
 VALUES ('Microsoft'), ('Company');
 
@@ -174,9 +176,9 @@ VALUES
 (3, 1),
 (4, 1),(4, 6);
 
--- Insert into TemplateView (1000 rows)
+-- Insert into TemplateView (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @ListTemplateId_TV INT = (SELECT TOP 1 Id FROM ListTemplate ORDER BY NEWID());
     DECLARE @ViewTypeId_TV INT = (SELECT TOP 1 Id FROM ViewType ORDER BY NEWID());
@@ -224,9 +226,9 @@ VALUES
 -- Person (5)
 (5, 1), (5, 7), (5, 6);
 
--- Insert into TemplateColumn (1000 rows)
+-- Insert into TemplateColumn (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @ListTemplateId_TC INT = (SELECT TOP 1 Id FROM ListTemplate ORDER BY NEWID());
     DECLARE @SystemDataTypeId_TC INT = (SELECT TOP 1 Id FROM SystemDataType ORDER BY NEWID());
@@ -237,9 +239,9 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
--- Insert into TemplateSampleRow (1000 rows)
+-- Insert into TemplateSampleRow (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @ListTemplateId_TSR INT = (SELECT TOP 1 Id FROM ListTemplate ORDER BY NEWID());
    INSERT INTO TemplateSampleRow (ListTemplateId, DisplayOrder)
@@ -247,9 +249,9 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
--- Insert into TemplateSampleCell (1000 rows)
+-- Insert into TemplateSampleCell (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @TemplateSampleRowId_TSC INT = (SELECT TOP 1 Id FROM TemplateSampleRow ORDER BY NEWID());
     DECLARE @TemplateColumnId_TSC INT = (SELECT TOP 1 Id FROM TemplateColumn WHERE ListTemplateId = (SELECT ListTemplateId FROM TemplateSampleRow WHERE Id = @TemplateSampleRowId_TSC) ORDER BY NEWID());
@@ -262,9 +264,9 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
--- Insert into TemplateViewSetting (1000 rows)
+-- Insert into TemplateViewSetting (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @TemplateViewId_TVS INT = (SELECT TOP 1 Id FROM TemplateView ORDER BY NEWID());
     DECLARE @ViewTypeSettingId_TVS INT = (SELECT TOP 1 Id FROM ViewTypeSetting ORDER BY NEWID());
@@ -307,9 +309,9 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
--- Insert into ListView (1000 rows)
+-- Insert into ListView (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @ListId_LV INT = (SELECT TOP 1 Id FROM List ORDER BY NEWID());
     DECLARE @ViewName_LV NVARCHAR(255);
@@ -363,9 +365,9 @@ VALUES
 (5, 15, 'true'),        -- Required
 (5, 16, 'avatarOnly');  -- Display Type
 
--- Insert into ListDynamicColumn (1000 rows)
+-- Insert into ListDynamicColumn (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @ListId_LDC INT = (SELECT TOP 1 Id FROM List ORDER BY NEWID());
     DECLARE @ColumnName_LDC NVARCHAR(255);
@@ -393,9 +395,9 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
--- Insert into ListColumnSettingValue (1000 rows)
+-- Insert into ListColumnSettingValue (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @ColumnId_LCSV INT = (SELECT TOP 1 Id FROM ListDynamicColumn ORDER BY NEWID());
     DECLARE @DataTypeSettingKeyId_LCSV INT = (SELECT TOP 1 Id FROM DataTypeSettingKey ORDER BY NEWID());
@@ -408,9 +410,9 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
--- Insert into ListViewSetting (1000 rows)
+-- Insert into ListViewSetting (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @ListViewId_LVS INT = (SELECT TOP 1 Id FROM ListView ORDER BY NEWID());
     DECLARE @ViewTypeSettingId_LVS INT = (SELECT TOP 1 Id FROM ViewTypeSetting ORDER BY NEWID());
@@ -424,9 +426,9 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
--- Insert into ListRow (1000 rows)
+-- Insert into ListRow (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @ListId_LR INT = (SELECT TOP 1 Id FROM List ORDER BY NEWID());
     DECLARE @CreatedBy_LR INT = (SELECT TOP 1 Id FROM Account ORDER BY NEWID());
@@ -435,9 +437,9 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
--- Insert into ListCellValue (1000 rows)
+-- Insert into ListCellValue (10000 rows)
 SET @Counter = 1;
-WHILE @Counter <= 1000
+WHILE @Counter <= 10000
 BEGIN
     DECLARE @ListRowId_LCV INT = (SELECT TOP 1 Id FROM ListRow ORDER BY NEWID());
     DECLARE @ListDynamicColumnId_LCV INT = (SELECT TOP 1 Id FROM ListDynamicColumn WHERE ListId = (SELECT ListId FROM ListRow WHERE Id = @ListRowId_LCV) ORDER BY NEWID());
@@ -470,7 +472,7 @@ BEGIN
     SET @Counter = @Counter + 1;
 END;
 
--- Insert into Permission (1000 rows)
+-- Insert into Permission
 INSERT INTO Permission (PermissionCode, PermissionName, PermissionIcon, PermissionDescription)
 VALUES 
 ('OWNER', 'Can edit list', 'Owner Icon', 'Can edit, add, or remove items, columns or views'),
@@ -510,6 +512,29 @@ BEGIN
     DECLARE @LinkPassword_SL NVARCHAR(255) = CASE WHEN @Counter % 2 = 0 THEN 'pass' + CAST(@Counter AS NVARCHAR(10)) ELSE NULL END;
     INSERT INTO ShareLink (TargetUrl, ListId, ScopeId, PermissionId, Note, ExpirationDate, IsLoginRequired, LinkPassword, CreatedBy)
     VALUES (@TargetUrl_SL, @ListId_SL, @ScopeId_SL, @PermissionId_SL, @Note_SL, @ExpirationDate_SL, @Counter % 2, @LinkPassword_SL, @CreatedBy_SL);
+    SET @Counter = @Counter + 1;
+END;
+
+-- Insert into ShareLinkOption
+INSERT INTO ShareLinkOption (OptionName, ValueType, DefaultValue, ScopeId)
+VALUES 
+('Is Login Required', 'BIT', '0', 1),
+('Set Expiration Date', 'DATETIME', NULL, 1),
+('Set Expiration Date', 'DATETIME', NULL, 3),
+('Set Password', 'NVARCHAR', NULL, 1);
+
+-- Insert into ShareLinkOptionValue (1000 rows)
+SET @Counter = 1;
+WHILE @Counter <= 1000
+BEGIN
+    DECLARE @ShareLinkId_SLOV INT = (SELECT TOP 1 Id FROM ShareLink ORDER BY NEWID());
+    DECLARE @ShareLinkOption_SLOV INT = (SELECT TOP 1 Id FROM ShareLinkOption ORDER BY NEWID());
+    DECLARE @OptionValue_SLOV NVARCHAR(255) = CASE 
+        WHEN (SELECT ValueType FROM KeySetting WHERE Id = (SELECT KeySettingId FROM DataTypeSettingKey WHERE Id = @ShareLinkOption_SLOV)) = 'INTEGER' THEN CAST((@Counter % 255 + 1) AS NVARCHAR(255))
+        ELSE 'Value' + CAST(@Counter AS NVARCHAR(10))
+    END;
+    INSERT INTO ShareLinkOptionValue (ShareLinkId, ShareLinkOptionId, OptionValue)
+    VALUES (@ShareLinkId_SLOV, @ShareLinkOption_SLOV, @OptionValue_SLOV);
     SET @Counter = @Counter + 1;
 END;
 
