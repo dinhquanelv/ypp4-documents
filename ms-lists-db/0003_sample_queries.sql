@@ -1,4 +1,4 @@
-USE MSListsV12;
+USE MSListsV14;
 GO
 
 -- screen 1: dashboard & account
@@ -136,12 +136,12 @@ DECLARE @ListTemplateId INT = 1;
 SELECT 
 	tsr.Id AS TemplateSampleRowId,
 	tc.Id AS TemplateColumnId,
-	tsc.CellValue
+	tscv.CellValue
 FROM TemplateSampleRow tsr
 CROSS JOIN TemplateColumn tc
-LEFT JOIN TemplateSampleCell tsc
-	ON tsc.TemplateSampleRowId = tsr.Id
-	AND tsc.TemplateColumnId = tc.Id
+LEFT JOIN TemplateSampleCellValue tscv
+	ON tscv.TemplateSampleRowId = tsr.Id
+	AND tscv.TemplateColumnId = tc.Id
 WHERE tsr.ListTemplateId = @ListTemplateId 
 	AND tc.ListTemplateId = @ListTemplateId
 ORDER BY tsr.DisplayOrder, tc.DisplayOrder
@@ -163,7 +163,7 @@ SELECT
 	END AS IsFavoriteList
 FROM List l
 JOIN Workspace w ON w.Id = l.WorkspaceId
-LEFT JOIN FavoriteList fl ON fl.ListId = l.Id AND fl.AccountId = @AccountId
+LEFT JOIN FavoriteList fl ON fl.ListId = l.Id AND fl.FavoredBy = @AccountId
 WHERE l.Id = @ListId
 GO
 
