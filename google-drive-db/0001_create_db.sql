@@ -41,32 +41,39 @@ CREATE TABLE Account (
     UserId INT PRIMARY KEY IDENTITY(1,1),
     UserName NVARCHAR(50) NOT NULL,
     Email NVARCHAR(50) UNIQUE NOT NULL,
-    PasswordHash NVARCHAR(MAX) NOT NULL,
-    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    PasswordHash NVARCHAR(255) NOT NULL,
 	UserImg NVARCHAR(50),
     LastLogin DATETIME,
 	UsedCapacity bigint,
-	Capacity bigint
+	Capacity bigint,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
 CREATE TABLE Color(
 	ColorId INT PRIMARY KEY IDENTITY(1,1),
 	ColorName NVARCHAR(50),
-	ColorIcon NVARCHAR(50)
+	ColorIcon NVARCHAR(50),
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 )
 GO
 
 CREATE TABLE Permission (
     PermissionId INT PRIMARY KEY IDENTITY(1,1),
     PermissionName NVARCHAR(50) NOT NULL,
-	PermissionPriority int
+	PermissionPriority int,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
 CREATE TABLE ObjectType (
     ObjectTypeId INT PRIMARY KEY IDENTITY(1,1),
-    ObjectTypeName NVARCHAR(50) NOT NULL
+    ObjectTypeName NVARCHAR(50) NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
@@ -75,11 +82,11 @@ CREATE TABLE Folder (
     ParentId INT,
     OwnerId INT NOT NULL,
     FolderName NVARCHAR(50) NOT NULL,
-    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
-    UpdatedAt DATETIME,
     FolderPath VARCHAR(50),
 	FolderStatus VARCHAR(50),
 	ColorId int,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (ParentId) REFERENCES Folder(FolderId),
     FOREIGN KEY (OwnerId) REFERENCES Account(UserId),
     FOREIGN KEY (ColorId) REFERENCES Color(ColorId)
@@ -89,7 +96,9 @@ GO
 CREATE TABLE FileType (
     FileTypeId INT PRIMARY KEY IDENTITY(1,1),
     FileTypeName NVARCHAR(50) NOT NULL,
-    Icon NVARCHAR(50)
+    Icon NVARCHAR(50),
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
@@ -99,12 +108,13 @@ CREATE TABLE UserFile (
     OwnerId INT NOT NULL,
     Size BIGINT,
     UserFileName NVARCHAR(50) NOT NULL,
-    UserFilePath NVARCHAR(MAX),
+    UserFilePath NVARCHAR(255),
 	UserFileThumbNailImg NVARCHAR(50),
     FileTypeId INT,
     ModifiedDate DATETIME,
     UserFileStatus NVARCHAR(50),
-    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (FolderId) REFERENCES Folder(FolderId),
     FOREIGN KEY (OwnerId) REFERENCES Account(UserId),
     FOREIGN KEY (FileTypeId) REFERENCES FileType(FileTypeId)
@@ -116,9 +126,10 @@ CREATE TABLE Share (
     Sharer INT NOT NULL,
     ObjectId INT NOT NULL,
     ObjectTypeId INT NOT NULL,
-    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
 	ShareUrl varchar(50),
 	UrlApprove bit,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (Sharer) REFERENCES Account(UserId),
     FOREIGN KEY (ObjectTypeId) REFERENCES ObjectType(ObjectTypeId)
 );
@@ -129,8 +140,8 @@ CREATE TABLE SharedUser (
     ShareId INT,
     UserId INT,
     PermissionId INT,
-	CreatedAt DATETIME, 
-	ModifiedAt DATETIME,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (ShareId) REFERENCES Share(ShareId),
     FOREIGN KEY (UserId) REFERENCES Account(UserId),
     FOREIGN KEY (PermissionId) REFERENCES Permission(PermissionId)
@@ -141,12 +152,13 @@ CREATE TABLE FileVersion (
     FileVersionId INT PRIMARY KEY IDENTITY(1,1),
     FileId INT,
     FileVersion INT NOT NULL,
-    FileVersionPath NVARCHAR(MAX),
-    CreatedAt DATETIME2,
+    FileVersionPath NVARCHAR(255),
     UpdateBy INT,
     IsCurrent BIT,
-    VersionFile NVARCHAR(MAX),
+    VersionFile NVARCHAR(255),
     Size BIGINT,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (FileId) REFERENCES UserFile(FileId),
     FOREIGN KEY (UpdateBy) REFERENCES Account(UserId)
 );
@@ -159,6 +171,8 @@ CREATE TABLE Trash (
     RemovedDatetime DATETIME2,
     UserId INT,
     IsPermanent BIT DEFAULT 0,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (UserId) REFERENCES Account(UserId),
     FOREIGN KEY (ObjectTypeId) REFERENCES ObjectType(ObjectTypeId)
 );
@@ -168,7 +182,9 @@ CREATE TABLE ProductItem (
     ProductId INT PRIMARY KEY IDENTITY(1,1),
     ProductName NVARCHAR(50) NOT NULL,
     Cost DECIMAL(10,2) NOT NULL,
-    Duration INT NOT NULL
+    Duration INT NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
@@ -176,7 +192,9 @@ CREATE TABLE Promotion (
     PromotionId INT PRIMARY KEY IDENTITY(1,1),
     PromotionName NVARCHAR(50) NOT NULL,
     Discount INT NOT NULL,
-    IsPercent BIT NOT NULL
+    IsPercent BIT NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
@@ -188,6 +206,8 @@ CREATE TABLE UserProduct (
     IsFirstPaying BIT,
     PromotionId INT,
     EndDatetime DATETIME2,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (UserId) REFERENCES Account(UserId),
     FOREIGN KEY (ProductId) REFERENCES ProductItem(ProductId),
     FOREIGN KEY (PromotionId) REFERENCES Promotion(PromotionId)
@@ -199,6 +219,8 @@ CREATE TABLE BannedUser (
     UserId INT,
     BannedAt DATETIME2,
     BannedUserId INT,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (UserId) REFERENCES Account(UserId),
     FOREIGN KEY (BannedUserId) REFERENCES Account(UserId)
 );
@@ -209,6 +231,8 @@ CREATE TABLE FavoriteObject (
     OwnerId INT,
     ObjectId INT NOT NULL,
     ObjectTypeId INT NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (OwnerId) REFERENCES Account(UserId),
     FOREIGN KEY (ObjectTypeId) REFERENCES ObjectType(ObjectTypeId)
 );
@@ -219,8 +243,10 @@ CREATE TABLE ActionRecent (
     UserId INT,
     ObjectId INT,
 	ObjectTypeId INT,
-    ActionLog NVARCHAR(MAX),
+    ActionLog NVARCHAR(255),
     ActionDateTime DATETIME2,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (UserId) REFERENCES Account(UserId),
     FOREIGN KEY (ObjectTypeId) REFERENCES ObjectType(ObjectTypeId)
 );
@@ -230,25 +256,30 @@ CREATE TABLE SearchHistory (
 	SearchId INT PRIMARY KEY IDENTITY(1,1),
 	UserId INT,
 	FOREIGN KEY (UserId) REFERENCES Account(UserId),
-	SearchToken NVARCHAR(MAX),
+	SearchToken NVARCHAR(255),
 	SearchDatetime DATETIME,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 
 CREATE TABLE UserSession (
     SessionId INT PRIMARY KEY IDENTITY(1,1),
     UserId INT,
     Token NVARCHAR(50) NOT NULL,
-    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
     ExpiresAt DATETIME,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (UserId) REFERENCES Account(UserId)
 );
 GO
 
 CREATE TABLE AppSetting(
     SettingId INT PRIMARY KEY IDENTITY(1,1),
-    SettingKey VARCHAR(MAX),
-    SettingValue VARCHAR(MAX),
-    Decription VARCHAR(MAX)
+    SettingKey VARCHAR(255),
+    SettingValue VARCHAR(255),
+    Decription VARCHAR(255),
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
@@ -256,6 +287,8 @@ CREATE TABLE SettingUser(
     SettingUserId INT PRIMARY KEY IDENTITY(1,1),
     SettingId INT,
     UserId INT,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (UserId) REFERENCES Account(UserId),
     FOREIGN KEY (SettingId ) REFERENCES AppSetting(SettingId )
 );
@@ -269,10 +302,11 @@ GO
 CREATE TABLE FileContent (
     ContentId INT PRIMARY KEY IDENTITY(1,1),
     FileId INT NOT NULL,
-    ContentChunk NVARCHAR(MAX) NOT NULL,
+    ContentChunk NVARCHAR(255) NOT NULL,
     ChunkIndex INT NOT NULL,
     DocumentLength INT NULL, -- Nullable to allow trigger to set it
-    CreatedAt DATETIME DEFAULT GETDATE(),
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (FileId) REFERENCES UserFile(FileId),
     CONSTRAINT UC_FileContent UNIQUE (FileId, ChunkIndex)
 );
@@ -283,7 +317,8 @@ CREATE TABLE Term (
     TermId INT PRIMARY KEY IDENTITY(1,1),
     Term NVARCHAR(50) NOT NULL,
     FileContentId INT NOT NULL,
-    CreatedAt DATETIME DEFAULT GETDATE(),
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (FileContentId) REFERENCES FileContent(ContentId)
 );
 GO
@@ -294,7 +329,7 @@ CREATE TABLE SearchIndex (
     FileContentId INT NOT NULL,
     Term NVARCHAR(50) NOT NULL,
     TermFrequency INT NOT NULL,
-    TermPositions NVARCHAR(MAX),
+    TermPositions NVARCHAR(255),
     Bm25Score FLOAT NOT NULL DEFAULT 0,
     IDF FLOAT NOT NULL DEFAULT 0,
     FOREIGN KEY (FileContentId) REFERENCES FileContent(ContentId),
