@@ -249,5 +249,48 @@ SELECT FolderId, FolderName, FolderPath
 FROM Folder
 WHERE ParentId = 1
 
--- screen 10: search
+-- screen 10: full text search
+-- case 1: full text search query with token
+SELECT 
+    uf.FileId,
+    uf.UserFileName,
+    si.Term,
+    si.TermFrequency,
+    si.TermPositions
+FROM SearchIndex si
+JOIN FileContent fc ON si.FileContentId = fc.ContentId
+JOIN UserFile uf ON fc.FileId = uf.FileId
+WHERE si.Term IN ('vendor', 'report', 'product')
+ORDER BY si.Bm25Score
+GO
+
+-- case 2: full text search query with string
+DECLARE @TextQuery NVARCHAR(50) = 'product';
+WITH TokenizedQuery AS (
+    SELECT Term
+    FROM dbo.fn_TokenizeText(@TextQuery)
+),
+AllMatches AS (
+    SELECT s.FileContentId, COUNT(*) as MatchingTerms
+    FROM SearchIndex s
+    JOIN TokenizedQuery tq ON s.Term = tq.Term
+    GROUP BY s.FileContentId
+    HAVING COUNT(*) > 0
+)
+SELECT 
+    fc.FileId,
+	uf.UserFileName,
+    fc.ContentChunk,
+    SUM(s.Bm25Score) AS TotalBm25Score,
+    COUNT(s.Term) AS MatchedTerms,
+    (SELECT COUNT(*) FROM TokenizedQuery) AS TotalQueryTerms
+FROM AllMatches am
+JOIN FileContent fc ON am.FileContentId = fc.ContentId
+JOIN SearchIndex s ON s.FileContentId = fc.ContentId
+join UserFile uf on fc.FileId = uf.FileId
+WHERE s.Term IN (SELECT Term FROM TokenizedQuery)
+GROUP BY fc.FileId, fc.ContentChunk, uf.UserFileName
+ORDER BY TotalBm25Score DESC;
+GO
+
 -- screen 11: product
