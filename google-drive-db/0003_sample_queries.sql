@@ -139,9 +139,48 @@ LEFT JOIN UserFile uf ON ro.ObjectId = uf.FileId AND ro.ObjectTypeId = 2
 LEFT JOIN Folder f ON ro.ObjectId = f.FolderId AND ro.ObjectTypeId = 1
 WHERE ro.FileOwnerId =11 OR ro.FolderOwnerId = 11
 ORDER BY ro.ActionDateTime DESC;
+GO
 
 -- screen 5: started 
+DECLARE @UserId INT = 794
+SELECT
+	f.FileId,
+	f.UserFileName,
+	a.USerName as FileOwnerName,
+	a.UserId as UserId,
+	ft.FileTypeName
+FROM FavoriteObject fa
+LEFT JOIN UserFile f ON fa.ObjectTypeId = 2 AND fa.ObjectId = f.FileId
+LEFT JOIN Account a ON f.OwnerId = a.UserId 
+JOIN FileType ft ON f.FileTypeId = ft.FileTypeId
+WHERE fa.OwnerId = @UserId
+GO
+
 -- screen 6: trash
+DECLARE @UserId INT = 1;
+SELECT
+    t.TrashId,
+    ot.ObjectTypeName,
+    CASE 
+        WHEN t.ObjectTypeId = 1 THEN fo.FolderName
+        WHEN t.ObjectTypeId = 2 THEN uf.UserFileName
+        ELSE NULL
+    END AS ObjectName,
+    CASE 
+        WHEN t.ObjectTypeId = 1 THEN fo.FolderId
+        WHEN t.ObjectTypeId = 2 THEN uf.FileId
+        ELSE NULL
+    END AS ObjectId,
+
+    t.RemovedDatetime,
+    t.IsPermanent
+FROM Trash t
+JOIN ObjectType ot ON t.ObjectTypeId = ot.ObjectTypeId
+LEFT JOIN Folder fo ON t.ObjectTypeId = 1 AND t.ObjectId = fo.FolderId
+LEFT JOIN UserFile uf ON t.ObjectTypeId = 2 AND t.ObjectId = uf.FileId
+WHERE t.UserId = @UserId
+ORDER BY t.RemovedDatetime DESC;
+
 -- screen 7: product
 -- screen 8: search
 -- screen 9: folder detail
