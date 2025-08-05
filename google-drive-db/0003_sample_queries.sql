@@ -34,7 +34,7 @@ SELECT TOP 10
 	ar.ActionDateTime
 FROM ActionRecent ar
 JOIN Account a ON ar.UserId = a.UserId
-JOIN Folder fo ON ar.ObjectTypeId = 1 and ar.ObjectId = fo.FolderId
+JOIN Folder fo ON ar.ObjectTypeId = 1 AND ar.ObjectId = fo.FolderId
 WHERE ar.UserId = @userId  
 ORDER BY ar.ActionDateTime DESC
 GO
@@ -49,7 +49,30 @@ SELECT TOP 10
 	ar.ActionDateTime
 FROM ActionRecent ar 
 JOIN Account a ON ar.UserId = a.UserId
-JOIN UserFile f ON ar.ObjectTypeId = 2 and ar.ObjectId = f.FileId
+JOIN UserFile f ON ar.ObjectTypeId = 2 AND ar.ObjectId = f.FileId
 WHERE ar.UserId = @userId
 ORDER BY ar.ActionDateTime DESC
+GO
+
+-- screen 2: my drive
+-- case 1: select user folder
+DECLARE @UserId INT = 1 
+SELECT 
+	fo.FolderId,
+	a.UserName,
+	fo.FolderName
+FROM Folder fo
+JOIN Account a ON fo.OwnerId = a.UserId
+WHERE a.UserId =@UserId
+GO
+
+-- case 2: select user file
+DECLARE @UserId INT = 1 
+SELECT 
+	uf.FileId,
+	a.UserName,
+	uf.UserFileName
+FROM UserFile uf 
+JOIN Account a ON uf.OwnerId = a.UserId
+WHERE a.UserId = @UserId
 GO
