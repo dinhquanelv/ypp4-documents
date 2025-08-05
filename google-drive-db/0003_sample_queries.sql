@@ -192,10 +192,62 @@ JOIN ObjectType ot ON t.ObjectTypeId = ot.ObjectTypeId
 LEFT JOIN Folder fo ON t.ObjectTypeId = 1 AND t.ObjectId = fo.FolderId
 LEFT JOIN UserFile uf ON t.ObjectTypeId = 2 AND t.ObjectId = uf.FileId
 WHERE t.UserId = @UserId
-ORDER BY t.RemovedDatetime DESC;
+ORDER BY t.RemovedDatetime DESC
+GO
 
--- screen 7: product
+-- screen 8: Banned user
+DECLARE @UserId int = 533
+SELECT 
+    bu.Id AS BanId,
+    Banned.UserName AS BannedUserName,
+    Banner.UserName AS BannedByUserName,
+    bu.BannedAt
+FROM BannedUser bu
+JOIN Account Banned ON bu.UserId = Banned.UserId
+JOIN Account Banner ON bu.BannedUserId = Banner.UserId
+where bu.UserId = @UserId
+ORDER BY bu.BannedAt DESC
+GO
 
+-- screen 9: folder structure
+-- case 1: select folders by user id
+DECLARE @UserId INT = 18
+SELECT 
+    f.FolderPath,
+    c.ColorName
+FROM Folder f
+JOIN Account a ON f.OwnerId = a.UserId
+JOIN Color c ON f.ColorId = c.ColorId
+WHERE f.OwnerId = @UserId
+GO
 
--- screen 8: search
--- screen 9: folder detail
+-- case 2: select all children by folder id
+DECLARE @FolderId INT = 1;
+WITH RecursiveFolders AS (
+    SELECT FolderId, FolderName, ParentId, FolderPath
+    FROM Folder
+    WHERE FolderId = @FolderId
+    UNION ALL
+    SELECT f.FolderId, f.FolderName, f.ParentId, f.FolderPath
+    FROM Folder f
+    JOIN RecursiveFolders rf ON f.ParentId = rf.FolderId
+    WHERE f.FolderPath LIKE rf.FolderPath + '/%'
+)
+SELECT 
+    rf.FolderName,
+    rf.ParentId,
+    rf.FolderPath,
+    fo.FolderName AS ParentFolderName
+FROM RecursiveFolders rf
+LEFT JOIN Folder fo ON rf.ParentId = fo.FolderId
+WHERE rf.FolderId != 1
+ORDER BY rf.FolderPath;
+GO
+
+-- case 3: select children by folder id
+SELECT FolderId, FolderName, FolderPath
+FROM Folder
+WHERE ParentId = 1
+
+-- screen 10: search
+-- screen 11: product
