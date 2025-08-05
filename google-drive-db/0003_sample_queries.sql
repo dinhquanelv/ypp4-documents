@@ -142,17 +142,31 @@ ORDER BY ro.ActionDateTime DESC;
 GO
 
 -- screen 5: started 
+-- case 1: file stared
 DECLARE @UserId INT = 794
 SELECT
 	f.FileId,
 	f.UserFileName,
-	a.USerName as FileOwnerName,
-	a.UserId as UserId,
+	a.USerName,
+	a.UserId,
 	ft.FileTypeName
 FROM FavoriteObject fa
 LEFT JOIN UserFile f ON fa.ObjectTypeId = 2 AND fa.ObjectId = f.FileId
 LEFT JOIN Account a ON f.OwnerId = a.UserId 
 JOIN FileType ft ON f.FileTypeId = ft.FileTypeId
+WHERE fa.OwnerId = @UserId
+GO
+
+-- case 2: folder started
+DECLARE @UserId INT = 794
+SELECT
+	f.FolderId,
+	f.FolderName,
+	a.USerName,
+	a.UserId
+FROM FavoriteObject fa
+LEFT JOIN Folder f ON fa.ObjectTypeId = 1 AND fa.ObjectId = f.FolderId
+LEFT JOIN Account a ON f.OwnerId = a.UserId
 WHERE fa.OwnerId = @UserId
 GO
 
@@ -171,7 +185,6 @@ SELECT
         WHEN t.ObjectTypeId = 2 THEN uf.FileId
         ELSE NULL
     END AS ObjectId,
-
     t.RemovedDatetime,
     t.IsPermanent
 FROM Trash t
@@ -182,5 +195,7 @@ WHERE t.UserId = @UserId
 ORDER BY t.RemovedDatetime DESC;
 
 -- screen 7: product
+
+
 -- screen 8: search
 -- screen 9: folder detail
