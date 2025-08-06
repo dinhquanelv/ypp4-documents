@@ -21,8 +21,9 @@ GO
 DECLARE @AccountId INT = 1;
 SELECT 
 	l.Id AS ListId,
-	l.ListName, 
+	l.Color,
 	l.Icon, 
+	l.ListName, 
 	w.WorkspaceName, 
 	l.AccessedAt
 FROM List l
@@ -37,8 +38,9 @@ GO
 DECLARE @AccountId INT = 1;
 SELECT 
 	l.Id AS ListId,
-	l.ListName, 
+	l.Color,
 	l.Icon, 
+	l.ListName, 
 	w.WorkspaceName
 FROM List l
 JOIN AccountList al ON al.ListId = l.Id
@@ -50,8 +52,7 @@ GO
 
 -- case 4: find Account by Id
 DECLARE @AccountId INT = 1;
-SELECT a.FirstName,
-       a.LastName,
+SELECT a.LastName + ' ' + a.FirstName AS FullName,
        a.Email,
        a.Avatar,
        a.Company
