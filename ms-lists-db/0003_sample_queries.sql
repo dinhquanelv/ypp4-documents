@@ -1,4 +1,4 @@
-USE MSListsV14;
+USE MSListsV15;
 GO
 
 -- screen 1: dashboard & account
@@ -17,46 +17,56 @@ JOIN Workspace w ON w.Id = l.WorkspaceId
 WHERE a.Id = @AccountId
 GO
 
--- case 2: find recents list from user
+-- case 2: find recents list
 DECLARE @AccountId INT = 1;
 SELECT 
 	l.Id AS ListId,
-	l.ListName, 
+	l.Color,
 	l.Icon, 
+	l.ListName, 
 	w.WorkspaceName, 
-	l.UpdatedAt
+	l.AccessedAt
 FROM List l
-JOIN Account a ON a.Id = l.CreatedBy
+JOIN AccountList al ON al.ListId = l.Id
+JOIN Account a ON a.Id = al.AccountId
 JOIN Workspace w ON w.Id = l.WorkspaceId
 WHERE a.Id = @AccountId
-ORDER BY l.UpdatedAt DESC
+ORDER BY l.AccessedAt DESC
 GO
 
 -- case 3: find all list from user
-DECLARE @AccountId INT = 6;
+DECLARE @AccountId INT = 1;
 SELECT 
 	l.Id AS ListId,
-	l.ListName, 
+	l.Color,
 	l.Icon, 
+	l.ListName, 
 	w.WorkspaceName
 FROM List l
-JOIN Account a ON a.Id = l.CreatedBy
+JOIN AccountList al ON al.ListId = l.Id
+JOIN Account a ON a.Id = al.AccountId
 JOIN Workspace w ON w.Id = l.WorkspaceId
 WHERE a.Id = @AccountId
+ORDER BY l.CreatedAt DESC
 GO
 
 -- case 4: find Account by Id
 DECLARE @AccountId INT = 1;
-SELECT a.FirstName, a.LastName, a.Email, a.Avatar, a.Company 
-FROM Account a
-WHERE a.Id = @AccountId
+SELECT a.LastName + ' ' + a.FirstName AS FullName,
+       a.Email,
+       a.Avatar,
+       a.Company
+FROM ACCOUNT a
+WHERE a.Id = @AccountId 
 GO
 
 -- screen 2: create list screen (when user choose create new)
 -- case 1: show list type
-SELECT lt.Id AS ListTypeId, lt.Icon, lt.Title, lt.ListTypeDescription
-FROM ListType lt
-GO
+SELECT lt.Id AS ListTypeId,
+       lt.Icon,
+       lt.Title,
+       lt.ListTypeDescription
+FROM ListType lt GO
 
 -- case 2: show template from Microsoft
 DECLARE @ProviderId INT = 1;
@@ -101,7 +111,7 @@ SELECT
 	w.WorkspaceName, 
 	w.Icon
 FROM Workspace w
-JOIN WorkspaceMember wb ON wb.WorkspaceId = w.Id
+JOIN AccountWorkspace wb ON wb.WorkspaceId = w.Id
 JOIN Account a ON a.Id = wb.AccountId
 WHERE a.Id = @AccountId
 GO
@@ -145,6 +155,41 @@ LEFT JOIN TemplateSampleCellValue tscv
 WHERE tsr.ListTemplateId = @ListTemplateId 
 	AND tc.ListTemplateId = @ListTemplateId
 ORDER BY tsr.DisplayOrder, tc.DisplayOrder
+GO
+
+DECLARE @ListTemplateId INT = 1;
+DECLARE @cols NVARCHAR(MAX), @sql NVARCHAR(MAX);
+
+-- 1. Get dynamic column list
+SELECT @cols = STRING_AGG(QUOTENAME(tc.Id), ',')
+FROM TemplateColumn tc
+WHERE tc.ListTemplateId = @ListTemplateId;
+
+-- 2. Build dynamic SQL with PIVOT
+SET @sql = '
+SELECT *
+FROM (
+    SELECT 
+        tsr.Id AS TemplateSampleRowId,
+        tc.Id AS TemplateColumnId,
+        tscv.CellValue
+    FROM TemplateSampleRow tsr
+    CROSS JOIN TemplateColumn tc
+    LEFT JOIN TemplateSampleCellValue tscv
+        ON tscv.TemplateSampleRowId = tsr.Id
+        AND tscv.TemplateColumnId = tc.Id
+    WHERE tsr.ListTemplateId = ' + CAST(@ListTemplateId AS NVARCHAR) + '
+        AND tc.ListTemplateId = ' + CAST(@ListTemplateId AS NVARCHAR) + '
+) AS SourceTable
+PIVOT (
+    MAX(CellValue)
+    FOR TemplateColumnId IN (' + @cols + ')
+) AS PivotTable
+ORDER BY TemplateSampleRowId;
+';
+
+-- 3. Execute dynamic SQL
+EXEC sp_executesql @sql;
 GO
 
 -- screen 5: list (after user create list)

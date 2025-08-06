@@ -1,4 +1,4 @@
-﻿USE MSListsV14;
+﻿USE MSListsV15;
 GO
 
 IF EXISTS (SELECT 1 FROM TrashItem) BEGIN DELETE FROM TrashItem; DBCC CHECKIDENT ('TrashItem', RESEED, 0); END
@@ -21,6 +21,7 @@ IF EXISTS (SELECT 1 FROM ListDynamicColumn) BEGIN DELETE FROM ListDynamicColumn;
 IF EXISTS (SELECT 1 FROM SystemColumnSettingValue) BEGIN DELETE FROM SystemColumnSettingValue; DBCC CHECKIDENT ('SystemColumnSettingValue', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM SystemColumn) BEGIN DELETE FROM SystemColumn; DBCC CHECKIDENT ('SystemColumn', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListView) BEGIN DELETE FROM ListView; DBCC CHECKIDENT ('ListView', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM AccountList) BEGIN DELETE FROM AccountList; DBCC CHECKIDENT ('AccountList', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM FavoriteList) BEGIN DELETE FROM FavoriteList; DBCC CHECKIDENT ('FavoriteList', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM List) BEGIN DELETE FROM List; DBCC CHECKIDENT ('List', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM TemplateSampleCellValue) BEGIN DELETE FROM TemplateSampleCellValue; DBCC CHECKIDENT ('TemplateSampleCellValue', RESEED, 0); END
@@ -37,7 +38,7 @@ IF EXISTS (SELECT 1 FROM ViewType) BEGIN DELETE FROM ViewType; DBCC CHECKIDENT (
 IF EXISTS (SELECT 1 FROM ListTemplate) BEGIN DELETE FROM ListTemplate; DBCC CHECKIDENT ('ListTemplate', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM TemplateProvider) BEGIN DELETE FROM TemplateProvider; DBCC CHECKIDENT ('TemplateProvider', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListType) BEGIN DELETE FROM ListType; DBCC CHECKIDENT ('ListType', RESEED, 0); END
-IF EXISTS (SELECT 1 FROM WorkspaceMember) BEGIN DELETE FROM WorkspaceMember; DBCC CHECKIDENT ('WorkspaceMember', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM AccountWorkspace) BEGIN DELETE FROM AccountWorkspace; DBCC CHECKIDENT ('AccountWorkspace', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM Workspace) BEGIN DELETE FROM Workspace; DBCC CHECKIDENT ('Workspace', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM Account) BEGIN DELETE FROM Account; DBCC CHECKIDENT ('Account', RESEED, 0); END
 
@@ -74,8 +75,8 @@ VALUES
 ('Marketing Space', 'https://example.com/group4.png'),
 ('Data Analysts', 'https://example.com/group5.png');
 
--- Insert into WorkspaceMember (20 rows)
-INSERT INTO WorkspaceMember (AccountId, WorkspaceId)
+-- Insert into AccountWorkspace (20 rows)
+INSERT INTO AccountWorkspace (AccountId, WorkspaceId)
 VALUES
 (1, 1),    -- Alice -> My Lists
 (2, 2),    -- Bob -> My Lists
@@ -547,7 +548,61 @@ VALUES
 (30, 8),
 (11, 10);
 
--- Insert into ListView ( rows)
+-- Insert into AccountList (20 rows)
+INSERT INTO AccountList (AccountId, ListId)
+VALUES
+(1, 3),
+(2, 5),
+(3, 7),
+(4, 9),
+(5, 11),
+(6, 13),
+(7, 15),
+(8, 17),
+(9, 19),
+(10, 21),
+(1, 23),
+(2, 25),
+(3, 27),
+(4, 29),
+(5, 1),
+(6, 4),
+(7, 6),
+(8, 8),
+(9, 10),
+(10, 12),
+(1, 14),
+(2, 16),
+(3, 18),
+(4, 20),
+(5, 22),
+(6, 24),
+(7, 26),
+(8, 28),
+(9, 30),
+(10, 2),
+(1, 5),
+(2, 8),
+(3, 11),
+(4, 14),
+(5, 17),
+(6, 20),
+(7, 23),
+(8, 26),
+(9, 29),
+(10, 3),
+(1, 6),
+(2, 9),
+(3, 12),
+(4, 15),
+(5, 18),
+(6, 21),
+(7, 24),
+(8, 27),
+(9, 30),
+(10, 1);
+
+-- Insert into ListView (26 rows)
 INSERT INTO ListView (ViewName, DisplayOrder, ListId, ViewTypeId, CreatedBy)
 VALUES
 -- List 1
