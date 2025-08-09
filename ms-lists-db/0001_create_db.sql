@@ -20,7 +20,7 @@ IF OBJECT_ID('Permission', 'U') IS NOT NULL DROP TABLE Permission;
 IF OBJECT_ID('ListRowComment', 'U') IS NOT NULL DROP TABLE ListRowComment;
 IF OBJECT_ID('ListCellValue', 'U') IS NOT NULL DROP TABLE ListCellValue;
 IF OBJECT_ID('ListRow', 'U') IS NOT NULL DROP TABLE ListRow;
-IF OBJECT_ID('ListColumnSettingObject', 'U') IS NOT NULL DROP TABLE ListColumnSettingObject;
+IF OBJECT_ID('ListColumnObject', 'U') IS NOT NULL DROP TABLE ListColumnObject;
 IF OBJECT_ID('ListViewSetting', 'U') IS NOT NULL DROP TABLE ListViewSetting;
 IF OBJECT_ID('ListColumnSettingValue', 'U') IS NOT NULL DROP TABLE ListColumnSettingValue;
 IF OBJECT_ID('ListDynamicColumn', 'U') IS NOT NULL DROP TABLE ListDynamicColumn;
@@ -30,6 +30,7 @@ IF OBJECT_ID('ListView', 'U') IS NOT NULL DROP TABLE ListView;
 IF OBJECT_ID('AccountList', 'U') IS NOT NULL DROP TABLE AccountList;
 IF OBJECT_ID('FavoriteList', 'U') IS NOT NULL DROP TABLE FavoriteList;
 IF OBJECT_ID('List', 'U') IS NOT NULL DROP TABLE List;
+IF OBJECT_ID('TemplateColumnObject', 'U') IS NOT NULL DROP TABLE TemplateColumnObject;
 IF OBJECT_ID('TemplateSampleCellValue', 'U') IS NOT NULL DROP TABLE TemplateSampleCellValue;
 IF OBJECT_ID('TemplateSampleRow', 'U') IS NOT NULL DROP TABLE TemplateSampleRow;
 IF OBJECT_ID('TemplateViewSetting', 'U') IS NOT NULL DROP TABLE TemplateViewSetting;
@@ -213,6 +214,16 @@ CREATE TABLE TemplateSampleCellValue (
     UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 
+CREATE TABLE TemplateColumnObject (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    TemplateColumnId INT FOREIGN KEY REFERENCES TemplateColumn(Id) NOT NULL,
+    DisplayName NVARCHAR(255) NOT NULL,
+    DisplayColor NVARCHAR(20),
+    DisplayOrder INT NOT NULL DEFAULT 1,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+)
+
 CREATE TABLE List (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     ListName NVARCHAR(255) NOT NULL,
@@ -308,12 +319,12 @@ CREATE TABLE ListViewSetting (
     UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 
-CREATE TABLE ListColumnSettingObject (
+CREATE TABLE ListColumnObject (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     ListDynamicColumnId INT FOREIGN KEY REFERENCES ListDynamicColumn(Id) NOT NULL,
     DisplayName NVARCHAR(255) NOT NULL,
     DisplayColor NVARCHAR(20) NOT NULL,
-    DisplayOrder INT NOT NULL DEFAULT 0,
+    DisplayOrder INT NOT NULL DEFAULT 1,
     CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     UpdatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 )
@@ -436,7 +447,7 @@ CREATE TABLE ObjectType (
 
 CREATE TABLE TrashItem (
     Id INT IDENTITY(1,1) PRIMARY KEY,
-    ObjectId INT NOT NULL FOREIGN KEY REFERENCES ListColumnSettingObject(Id),
+    ObjectId INT NOT NULL,
     ObjectTypeId INT NOT NULL FOREIGN KEY REFERENCES ObjectType(Id),
     PathItem NVARCHAR(255),
     CreateBy INT NOT NULL FOREIGN KEY REFERENCES Account(Id),
