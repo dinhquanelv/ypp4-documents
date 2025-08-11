@@ -1,4 +1,4 @@
-﻿USE MSListsV15;
+﻿USE MSListsV16;
 GO
 
 IF EXISTS (SELECT 1 FROM TrashItem) BEGIN DELETE FROM TrashItem; DBCC CHECKIDENT ('TrashItem', RESEED, 0); END
@@ -14,7 +14,7 @@ IF EXISTS (SELECT 1 FROM Permission) BEGIN DELETE FROM Permission; DBCC CHECKIDE
 IF EXISTS (SELECT 1 FROM ListRowComment) BEGIN DELETE FROM ListRowComment; DBCC CHECKIDENT ('ListRowComment', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListCellValue) BEGIN DELETE FROM ListCellValue; DBCC CHECKIDENT ('ListCellValue', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListRow) BEGIN DELETE FROM ListRow; DBCC CHECKIDENT ('ListRow', RESEED, 0); END
-IF EXISTS (SELECT 1 FROM ListColumnSettingObject) BEGIN DELETE FROM ListColumnSettingObject; DBCC CHECKIDENT ('ListColumnSettingObject', RESEED, 0); END
+IF EXISTS (SELECT 1 FROM ListColumnObject) BEGIN DELETE FROM ListColumnObject; DBCC CHECKIDENT ('ListColumnObject', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListViewSetting) BEGIN DELETE FROM ListViewSetting; DBCC CHECKIDENT ('ListViewSetting', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListColumnSettingValue) BEGIN DELETE FROM ListColumnSettingValue; DBCC CHECKIDENT ('ListColumnSettingValue', RESEED, 0); END
 IF EXISTS (SELECT 1 FROM ListDynamicColumn) BEGIN DELETE FROM ListDynamicColumn; DBCC CHECKIDENT ('ListDynamicColumn', RESEED, 0); END
@@ -845,8 +845,8 @@ VALUES
 (25, 1, NULL, 'true'),            -- Grid View → IsPublic
 (26, 8, NULL, 'true');            -- Gallery View → IsPublic
 
--- Insert into ListColumnSettingObject (12 rows)
-INSERT INTO ListColumnSettingObject (ListDynamicColumnId, DisplayName, DisplayColor, DisplayOrder)
+-- Insert into ListColumnObject (12 rows)
+INSERT INTO ListColumnObject (ListDynamicColumnId, DisplayName, DisplayColor, DisplayOrder)
 VALUES
 -- Priority Column (ColumnId = 3) - Choice options
 (3, 'Low', '#4CAF50', 1),           -- Green for Low priority
