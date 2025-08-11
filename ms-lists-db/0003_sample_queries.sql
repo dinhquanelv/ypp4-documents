@@ -123,6 +123,17 @@ WHERE
 	tp.Id = @ProviderId
 GO
 	
+-- check cache for list template
+SELECT  
+    cp.usecounts,             -- Number of times the execution plan has been reused
+    cp.cacheobjtype,          -- Type of cached object (e.g., Compiled Plan, Execution Context)
+    cp.objtype,               -- Type of statement (Adhoc, Prepared, Proc, etc.)
+    st.text AS QueryText      -- The actual SQL query text
+FROM sys.dm_exec_cached_plans AS cp
+CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) AS st
+WHERE st.text LIKE '%ListTemplate%'  -- Filter queries related to the ListTemplate table
+ORDER BY cp.usecounts DESC;          -- Sort by reuse count in descending order
+
 -- case 3: show template from your organization
 DECLARE @ProviderId INT = 2;
 
