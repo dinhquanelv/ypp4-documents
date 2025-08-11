@@ -70,9 +70,31 @@ SELECT
 	a.Avatar,
 	a.Company
 FROM
-	ACCOUNT a
+	Account a
 WHERE
 	a.Id = @AccountId
+GO
+
+-- case 5: search list (apply paging for query)
+DECLARE @Query NVARCHAR(100) = 't'
+DECLARE @PageSize INT = 24;
+DECLARE @PageNumber INT = 1;
+
+SELECT 
+	l.Id AS ListId,
+	l.Icon,
+	l.Color,
+	l.ListName,
+	w.WorkspaceName
+FROM
+	List l
+	JOIN Workspace w ON w.Id = l.WorkspaceId
+WHERE
+	ListName LIKE '%' + @Query + '%'
+ORDER BY
+	ListName
+OFFSET (@PageNumber - 1) * @PageSize ROWS
+FETCH NEXT @PageSize ROWS ONLY;
 GO
 
 -- screen 2: create list screen (when user choose create new)
