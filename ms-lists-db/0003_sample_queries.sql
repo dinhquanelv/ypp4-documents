@@ -195,43 +195,7 @@ WHERE
 	lt.Id = @ListTemplateId
 GO
 
--- case 2: show all column in list template
-DECLARE @ListTemplateId INT = 1;
-
-SELECT
-	tc.Id AS TempalteColumn,
-	sdt.Icon,
-	tc.ColumnName
-FROM
-	TemplateColumn tc
-	JOIN SystemDataType sdt ON sdt.Id = tc.SystemDataTypeId
-WHERE
-	tc.ListTemplateId = 1
-ORDER BY
-	tc.DisplayOrder
-GO
-	
--- case 3: find sample data for list template
-DECLARE @ListTemplateId INT = 1;
-
-SELECT
-	tsr.Id AS TemplateSampleRowId,
-	tc.Id AS TemplateColumnId,
-	tscv.CellValue
-FROM
-	TemplateSampleRow tsr
-	CROSS JOIN TemplateColumn tc
-	LEFT JOIN TemplateSampleCellValue tscv ON tscv.TemplateSampleRowId = tsr.Id
-	AND tscv.TemplateColumnId = tc.Id
-WHERE
-	tsr.ListTemplateId = @ListTemplateId
-	AND tc.ListTemplateId = @ListTemplateId
-ORDER BY
-	tsr.DisplayOrder,
-	tc.DisplayOrder
-GO
-	
--- case 4: get all data of list
+-- case 2: get all data of list
 DECLARE @ListTemplateId INT = 1;
 DECLARE @cols NVARCHAR(MAX),
 		@sql NVARCHAR(MAX);
@@ -270,6 +234,38 @@ ORDER BY TemplateSampleRowId;
 
 -- 3. Execute dynamic SQL
 EXEC sp_executesql @sql;
+GO
+
+-- case 3: show all column in list template
+DECLARE @ListTemplateId INT = 1;
+
+SELECT
+	tc.Id AS TempalteColumn,
+	sdt.Icon,
+	tc.ColumnName
+FROM
+	TemplateColumn tc
+	JOIN SystemDataType sdt ON sdt.Id = tc.SystemDataTypeId
+WHERE
+	tc.ListTemplateId = 1
+ORDER BY
+	tc.DisplayOrder
+GO
+	
+-- case 4: show all view in list template
+DECLARE @ListTemplateId INT = 1;
+
+SELECT
+	tv.Id AS TempalteViewId,
+	vt.Icon,
+	tv.ViewName
+FROM
+	TemplateView tv
+	JOIN ViewType vt ON vt.Id = tv.ViewTypeId
+WHERE
+	tv.ListTemplateId = 1
+ORDER BY
+	tv.DisplayOrder
 GO
 
 -- screen 5: list (after user create list)
