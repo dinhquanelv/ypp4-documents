@@ -1,10 +1,10 @@
-IF DB_ID('MSListsV16') IS NULL
+IF DB_ID('MicrosoftLists') IS NULL
 BEGIN
-    CREATE DATABASE MSListsV16;
+    CREATE DATABASE MicrosoftLists;
 END;
 GO
 
-USE MSListsV16;
+USE MicrosoftLists;
 GO
 
 IF OBJECT_ID('TrashItem', 'U') IS NOT NULL DROP TABLE TrashItem;
@@ -103,7 +103,7 @@ CREATE TABLE ListTemplate (
     TemplateDescription NVARCHAR(255),
     Icon NVARCHAR(255),
     Color NVARCHAR(255),
-    Sumary NVARCHAR(255),
+    Summary NVARCHAR(255),
     Feature NVARCHAR(255),
     ListTypeId INT NOT NULL FOREIGN KEY REFERENCES ListType(Id),
     TemplateProviderId INT NOT NULL FOREIGN KEY REFERENCES TemplateProvider(Id),

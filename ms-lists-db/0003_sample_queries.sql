@@ -1,4 +1,4 @@
-USE MSListsV16;
+USE MicrosoftLists;
 GO
 	
 -- screen 1: dashboard & account
@@ -14,7 +14,7 @@ SELECT
 FROM
 	List l
 	JOIN FavoriteList fl ON fl.Id = l.Id
-	JOIN Account a ON a.Id = fl.ListId
+	JOIN Account a ON a.Id = fl.FavoredBy
 	JOIN Workspace w ON w.Id = l.WorkspaceId
 WHERE
 	a.Id = @AccountId
@@ -285,6 +285,7 @@ SELECT
 	END AS IsFavoriteList
 FROM
 	List l
+	JOIN Account a ON a.Id = @AccountId
 	JOIN Workspace w ON w.Id = l.WorkspaceId
 	LEFT JOIN FavoriteList fl ON fl.ListId = l.Id
 	AND fl.FavoredBy = @AccountId
@@ -504,13 +505,18 @@ WHERE
 GO
 
 -- screen 9: create view for list
--- case 1: create view with calendar type
-DECLARE @ViewTypeId INT = 2;
+-- case 1: find all view types
+SELECT 
+	Id,
+	TypeName,
+	Icon
+FROM
+	ViewType
+GO
 
+-- case 2: create view with calendar type
 SELECT
-	vt.Id AS ViewTypeId,
-	vt.Icon,
-	vt.TypeName,
+	vs.Id AS ViewSettingId,
 	vs.DisplayName,
 	vs.ValueType
 FROM
@@ -518,11 +524,11 @@ FROM
 	JOIN ViewType vt ON vt.Id = vts.ViewTypeId
 	JOIN ViewSetting vs ON vs.Id = vts.ViewSettingId
 WHERE
-	vt.Id = @ViewTypeId
+	vt.TypeName = 'Calendar'
 GO
 
--- case 2: ref column have type DATE for Calendar View
-DECLARE @ListId INT = 299;
+-- case 3: ref column have type DATE for Calendar View
+DECLARE @ListId INT = 1;
 
 SELECT
 	ldc.Id AS ListColumnId,
@@ -536,8 +542,8 @@ WHERE
 	AND l.Id = @ListId
 GO
 
--- case 3: ref title & subheading column for Calendar View
-DECLARE @ListId INT = 2;
+-- case 4: ref title & subheading column for Calendar View
+DECLARE @ListId INT = 1;
 
 SELECT
 	ldc.Id AS ListColumnId,
@@ -661,7 +667,7 @@ SELECT
 	FORMAT(ti.DeleteAt, 'M/d/yyyy h:mm tt') AS DateDeleted,
 	deleter.FirstName + ' ' + deleter.LastName AS DeletedBy,
 	creator.FirstName + ' ' + creator.LastName AS CreatedBy,
-	ti.PathItem AS OriginalLocation
+	ti.PathItem AS ItemPath
 FROM
 	TrashItem ti
 	JOIN Account creator ON creator.Id = ti.CreateBy

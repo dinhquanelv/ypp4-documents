@@ -1,4 +1,4 @@
-﻿USE MSListsV16;
+﻿USE MicrosoftLists;
 GO
 
 IF EXISTS (SELECT 1 FROM TrashItem) BEGIN DELETE FROM TrashItem; DBCC CHECKIDENT ('TrashItem', RESEED, 0); END
