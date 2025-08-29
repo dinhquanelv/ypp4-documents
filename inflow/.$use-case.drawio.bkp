@@ -1,0 +1,31 @@
+<mxfile host="Electron" modified="2025-08-29T07:42:19.977Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.4.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="QNCIF7JSm6m9fxlvn43h" version="24.4.0" type="device">
+  <diagram name="Page-1" id="UvNxeKXSwmhfEKoERZI9">
+    <mxGraphModel dx="1167" dy="690" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="M_LXP8l2FmLocnHhsC37-1" value="Manufacturing Director" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="60" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="M_LXP8l2FmLocnHhsC37-2" value="Manufacturing Manager" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="730" y="60" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="M_LXP8l2FmLocnHhsC37-4" value="Manufacturing Operator" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="460" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="M_LXP8l2FmLocnHhsC37-5" value="System" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="730" y="460" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="M_LXP8l2FmLocnHhsC37-6" value="Review MO" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="40" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="M_LXP8l2FmLocnHhsC37-7" value="Monitor production progress" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="160" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="M_LXP8l2FmLocnHhsC37-9" value="Export reports" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="280" width="120" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
